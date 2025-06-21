@@ -94,7 +94,11 @@ class ImportMapContentScript {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             // 检查是否是新的 importmap
-            if (node.tagName === "SCRIPT" && node.type === "importmap") {
+            if (
+              node.tagName === "SCRIPT" &&
+              node.type === "importmap" &&
+              node.id !== "import-map-overrider-injected"
+            ) {
               hasNewImportMap = true;
             }
             // 检查子元素中是否有 importmap
@@ -198,12 +202,16 @@ class ImportMapContentScript {
 // 初始化内容脚本
 let importMapContentScript;
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
+function initContentScript() {
+  if (!importMapContentScript) {
     importMapContentScript = new ImportMapContentScript();
-  });
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initContentScript);
 } else {
-  importMapContentScript = new ImportMapContentScript();
+  initContentScript();
 }
 
 // 页面卸载时清理

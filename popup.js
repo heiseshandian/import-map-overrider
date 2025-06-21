@@ -25,6 +25,22 @@ class ImportMapOverrider {
       this.clearAllOverrides();
     });
 
+    // 搜索功能
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+
+    searchInput.addEventListener("input", (e) => {
+      this.filterImportMaps(e.target.value);
+      clearSearchBtn.style.display = e.target.value ? "flex" : "none";
+    });
+
+    clearSearchBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      this.filterImportMaps("");
+      clearSearchBtn.style.display = "none";
+      searchInput.focus();
+    });
+
     // Event delegation for dynamically created buttons
     document.addEventListener("click", (e) => {
       if (e.target.classList.contains("override-btn")) {
@@ -58,7 +74,11 @@ class ImportMapOverrider {
         target: { tabId: tab.id },
         func: () => {
           // Extract import maps from the current page
-          const scripts = document.querySelectorAll('script[type="importmap"]');
+          let scripts = document.querySelectorAll('script[type="importmap"]');
+          // Filter out our own injected import map script
+          scripts = Array.from(scripts ?? []).filter(
+            (script) => script.id !== "import-map-overrider-injected"
+          );
           const importMaps = [];
 
           scripts.forEach((script, index) => {
@@ -191,6 +211,92 @@ class ImportMapOverrider {
       `;
       })
       .join("");
+
+    // 应用当前的搜索过滤
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput && searchInput.value) {
+      this.filterImportMaps(searchInput.value);
+    }
+  }
+
+  filterImportMaps(searchTerm) {
+    const container = document.getElementById("importMaps");
+    const importMapItems = container.querySelectorAll(".import-map-item");
+
+    if (!searchTerm.trim()) {
+      // 显示所有项目
+      importMapItems.forEach((item) => {
+        item.classList.remove("hidden");
+        const importItems = item.querySelectorAll(".import-item");
+        importItems.forEach((importItem) =>
+          importItem.classList.remove("hidden")
+        );
+      });
+      this.removeNoResultsMessage();
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    let hasVisibleResults = false;
+
+    importMapItems.forEach((mapItem) => {
+      const importItems = mapItem.querySelectorAll(".import-item");
+      let hasVisibleImports = false;
+
+      importItems.forEach((importItem) => {
+        const nameElement = importItem.querySelector(".import-name");
+        const urlElement = importItem.querySelector(".import-url");
+
+        const name = nameElement ? nameElement.textContent.toLowerCase() : "";
+        const url = urlElement ? urlElement.textContent.toLowerCase() : "";
+
+        const matches = name.includes(searchLower) || url.includes(searchLower);
+
+        if (matches) {
+          importItem.classList.remove("hidden");
+          hasVisibleImports = true;
+          hasVisibleResults = true;
+        } else {
+          importItem.classList.add("hidden");
+        }
+      });
+
+      // 如果这个import map有可见的导入项，则显示整个map
+      if (hasVisibleImports) {
+        mapItem.classList.remove("hidden");
+      } else {
+        mapItem.classList.add("hidden");
+      }
+    });
+
+    // 显示或隐藏"无结果"消息
+    if (!hasVisibleResults) {
+      this.showNoResultsMessage(searchTerm);
+    } else {
+      this.removeNoResultsMessage();
+    }
+  }
+
+  showNoResultsMessage(searchTerm) {
+    this.removeNoResultsMessage();
+    const container = document.getElementById("importMaps");
+    const noResultsDiv = document.createElement("div");
+    noResultsDiv.className = "no-results";
+    noResultsDiv.id = "noResultsMessage";
+    noResultsDiv.innerHTML = `
+      <div>未找到匹配 "${this.escapeHtml(searchTerm)}" 的结果</div>
+      <div style="font-size: 12px; margin-top: 4px; color: #999;">
+        尝试搜索其他包名或URL
+      </div>
+    `;
+    container.appendChild(noResultsDiv);
+  }
+
+  removeNoResultsMessage() {
+    const existing = document.getElementById("noResultsMessage");
+    if (existing) {
+      existing.remove();
+    }
   }
 
   quickOverride(name, url) {

@@ -88,17 +88,19 @@
 
         return element;
       };
-      
+
       // 添加MutationObserver监听DOM变化
       const self = this;
       const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE && 
-                node.tagName === 'SCRIPT' && 
-                node.type === 'importmap' &&
-                node.id !== 'import-map-overrider-injected') {
-              console.log('Import Map Overrider: 检测到新的import map', node);
+            if (
+              node.nodeType === Node.ELEMENT_NODE &&
+              node.tagName === "SCRIPT" &&
+              node.type === "importmap" &&
+              node.id !== "import-map-overrider-injected"
+            ) {
+              console.log("Import Map Overrider: 检测到新的import map", node);
               // 发现新的import map，重新应用覆盖
               setTimeout(() => {
                 if (Object.keys(self.overrides).length > 0) {
@@ -109,12 +111,12 @@
           });
         });
       });
-      
+
       observer.observe(document.head, {
         childList: true,
-        subtree: true
+        subtree: true,
       });
-      
+
       // 保存observer引用以便后续清理
       this.mutationObserver = observer;
     }
@@ -295,23 +297,28 @@
     INJECTION_DELAY: 100,
     MAX_RETRIES: 5,
     RETRY_INTERVAL: 200,
-    DEBUG_MODE: false
+    DEBUG_MODE: false,
   };
 
   // 暴露一些有用的方法到全局
   window.importMapOverrider = {
     getImportMaps: () => window.importMapInjector.getAllImportMaps(),
     getMergedImportMap: () => window.importMapInjector.getMergedImportMap(),
-    updateOverrides: (overrides) => window.importMapInjector.updateOverrides(overrides),
+    updateOverrides: (overrides) =>
+      window.importMapInjector.updateOverrides(overrides),
     getOverrides: () => window.importMapInjector.overrides,
     debug: {
       getConfig: () => CONFIG,
       setConfig: (newConfig) => Object.assign(CONFIG, newConfig),
       forceReapply: () => window.importMapInjector.applyOverrides(),
       getTimeline: () => window.importMapInjector.timeline || [],
-      enableDebug: () => { CONFIG.DEBUG_MODE = true; },
-      disableDebug: () => { CONFIG.DEBUG_MODE = false; }
-    }
+      enableDebug: () => {
+        CONFIG.DEBUG_MODE = true;
+      },
+      disableDebug: () => {
+        CONFIG.DEBUG_MODE = false;
+      },
+    },
   };
 
   console.log("Import Map Overrider: 页面注入脚本已加载");
