@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 500px;
+      min-height: 400px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .refresh-btn {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .refresh-btn:hover {
+      background: #3367d6;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    
+    .import-map-item {
+      background: #f8f9fa;
+      border: 1px solid #e8eaed;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    
+    .import-map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .import-map-type {
+      font-weight: 500;
+      color: #1a73e8;
+    }
+    
+    .toggle-btn {
+      background: none;
+      border: 1px solid #dadce0;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    
+    .import-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .import-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .import-item:last-child {
+      border-bottom: none;
+    }
+    
+    .import-name {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 12px;
+      color: #d73a49;
+      font-weight: 500;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .import-url {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 11px;
+      color: #666;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .override-btn {
+      background: #34a853;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+    }
+    
+    .override-btn:hover {
+      background: #2d8f47;
+    }
+    
+    .override-section {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 6px;
+      padding: 12px;
+    }
+    
+    .override-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .form-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
+    }
+    
+    .form-input {
+      padding: 6px 8px;
+      border: 1px solid #dadce0;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Monaco', 'Menlo', monospace;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-secondary {
+      background: #f8f9fa;
+      color: #5f6368;
+      border: 1px solid #dadce0;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      color: #666;
+      padding: 40px 20px;
+    }
+    
+    .overrides-list {
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    
+    .override-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      background: #e8f0fe;
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+    
+    .remove-btn {
+      background: #ea4335;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">Import Map Overrider</div>
+    <button class="refresh-btn" id="refreshBtn">刷新</button>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">当前页面的 Import Maps</div>
+    <div id="importMaps"></div>
+  </div>
+  
+  <div class="section override-section">
+    <div class="section-title">添加覆盖规则</div>
+    <div class="override-form">
+      <div class="form-group">
+        <label class="form-label">包名</label>
+        <input type="text" class="form-input" id="packageName" placeholder="例如: react">
+      </div>
+      <div class="form-group">
+        <label class="form-label">新的 URL</label>
+        <input type="text" class="form-input" id="packageUrl" placeholder="例如: https://esm.sh/react@18.2.0">
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="addOverride">添加覆盖</button>
+        <button class="btn-secondary" id="clearAll">清除所有</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <div class="section-title">当前覆盖规则</div>
+    <div id="overridesList"></div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
