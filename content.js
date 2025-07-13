@@ -4,89 +4,24 @@
 class ImportMapContentScript {
   constructor() {
     this.observer = null;
-    this.overrides = {};
     this.init();
   }
 
   async init() {
-    // 首先注入 injected.js 脚本
-    await this.injectScript();
-
-    // 加载已保存的覆盖规则
-    await this.loadOverrides();
-
-    // 如果有覆盖规则，立即应用
-    if (Object.keys(this.overrides).length > 0) {
-      this.applyOverrides();
-    }
-
-    // 监听 DOM 变化，以便在动态添加的 importmap 上应用覆盖
+    // 监听 DOM 变化，以便检测新的 import maps
     this.observeImportMaps();
 
     // 监听来自 popup 的消息
     this.setupMessageListener();
+
+    console.log('Import Map Overrider: Content Script 已初始化（Service Worker 模式）');
   }
 
-  injectScript() {
-    return new Promise((resolve) => {
-      // 检查是否已经注入
-      if (document.getElementById("import-map-overrider-injected-script")) {
-        resolve();
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.id = "import-map-overrider-injected-script";
-      script.src = chrome.runtime.getURL("injected.js");
-      script.onload = () => {
-        console.log("Import Map Overrider: injected.js 已加载");
-        resolve();
-      };
-      script.onerror = () => {
-        console.error("Import Map Overrider: injected.js 加载失败");
-        resolve();
-      };
-
-      // 注入到页面的主世界上下文
-      (document.head || document.documentElement).appendChild(script);
-    });
-  }
-
-  async loadOverrides() {
-    try {
-      const result = await chrome.storage.local.get(["importMapOverrides"]);
-      this.overrides = result.importMapOverrides || {};
-    } catch (error) {
-      console.error("Import Map Overrider: 加载覆盖规则失败", error);
-    }
-  }
-
-  applyOverrides() {
-    if (Object.keys(this.overrides).length === 0) {
-      // 通知注入脚本清除覆盖规则
-      this.notifyInjectedScript({});
-      return;
-    }
-
-    // 通过自定义事件通知注入脚本应用覆盖规则
-    this.notifyInjectedScript(this.overrides);
-
-    console.log(
-      "Import Map Overrider: 已通知注入脚本应用覆盖规则",
-      this.overrides
-    );
-  }
-
-  notifyInjectedScript(overrides) {
-    // 通过自定义事件与注入脚本通信，避免 CSP 违规
-    const event = new CustomEvent("importMapOverrideUpdate", {
-      detail: { overrides },
-    });
-    window.dispatchEvent(event);
-  }
+  // Service Worker 模式下不再需要注入脚本和应用覆盖规则
+  // 覆盖功能现在通过 Service Worker 的网络拦截实现
 
   observeImportMaps() {
-    // 创建 MutationObserver 来监听 DOM 变化
+    // 创建 MutationObserver 来监听 DOM 变化，用于检测新的 import maps
     this.observer = new MutationObserver((mutations) => {
       let hasNewImportMap = false;
 
@@ -96,8 +31,7 @@ class ImportMapContentScript {
             // 检查是否是新的 importmap
             if (
               node.tagName === "SCRIPT" &&
-              node.type === "importmap" &&
-              node.id !== "import-map-overrider-injected"
+              node.type === "importmap"
             ) {
               hasNewImportMap = true;
             }
@@ -112,11 +46,9 @@ class ImportMapContentScript {
         });
       });
 
-      // 如果检测到新的 importmap，重新应用覆盖规则
-      if (hasNewImportMap && Object.keys(this.overrides).length > 0) {
-        setTimeout(() => {
-          this.applyOverrides();
-        }, 100); // 稍微延迟以确保 DOM 完全更新
+      // 如果检测到新的 importmap，记录日志（Service Worker 会自动处理拦截）
+      if (hasNewImportMap) {
+        console.log('Import Map Overrider: 检测到新的 import map');
       }
     });
 
@@ -128,23 +60,12 @@ class ImportMapContentScript {
   }
 
   setupMessageListener() {
-    // 监听来自 popup 或 background 的消息
+    // 监听来自 popup 的消息
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       switch (message.type) {
         case "GET_IMPORT_MAPS":
           sendResponse(this.extractImportMaps());
           break;
-        case "APPLY_OVERRIDES":
-          this.overrides = message.overrides || {};
-          this.applyOverrides();
-          sendResponse({ success: true });
-          break;
-        case "RELOAD_OVERRIDES":
-          this.loadOverrides().then(() => {
-            this.applyOverrides();
-            sendResponse({ success: true });
-          });
-          return true; // 保持消息通道开放
         default:
           sendResponse({ error: "Unknown message type" });
       }
@@ -162,8 +83,8 @@ class ImportMapContentScript {
         const content = script.textContent || script.innerHTML;
         const parsed = JSON.parse(content);
 
-        // 检查是否是我们注入的覆盖脚本
-        const isOverrideScript = script.id === "import-map-overrider-injected";
+        // 在 Service Worker 模式下，不再有注入的覆盖脚本
+        const isOverrideScript = false;
 
         importMaps.push({
           index: index + 1,

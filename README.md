@@ -10,11 +10,12 @@
 - 支持动态添加的 Import Maps 检测
 - 区分原始 Import Maps 和覆盖规则
 
-### ⚡ 实时覆盖功能
+### ⚡ 网络拦截覆盖功能
 - 一键覆盖任何包的导入路径
 - 支持添加自定义的包覆盖规则
 - 覆盖规则持久化存储，跨页面生效
-- 实时应用覆盖，无需刷新页面
+- 使用 Service Worker 拦截网络请求实现覆盖
+- 🔗 **智能依赖处理**：自动处理相关依赖包的版本兼容性
 
 ### 🎯 开发者友好
 - 直观的用户界面，易于使用
@@ -45,7 +46,7 @@
    - **包名**：要覆盖的包名（如 `react`、`lodash`）
    - **新的 URL**：新的包地址（如 `https://esm.sh/react@18.2.0`）
 2. 点击"添加覆盖"按钮
-3. 覆盖规则立即生效
+3. **刷新页面**使 Service Worker 拦截规则生效
 
 ### 管理覆盖规则
 - **查看当前规则**：在"当前覆盖规则"区域查看所有生效的覆盖
@@ -57,14 +58,14 @@
 ### 架构设计
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Popup UI      │    │  Content Script  │    │ Injected Script │
-│   (popup.js)    │◄──►│   (content.js)   │◄──►│  (injected.js)  │
+│   Popup UI      │    │  Content Script  │    │ Service Worker  │
+│   (popup.js)    │◄──►│   (content.js)   │◄──►│ (background.js) │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ Chrome Storage  │    │   DOM Observer   │    │  Page Context   │
-│   (持久化)       │    │   (监听变化)     │    │   (深度集成)     │
+│ Chrome Storage  │    │   DOM Observer   │    │ Network Intercept│
+│   (持久化)       │    │   (监听变化)     │    │   (请求拦截)     │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
@@ -82,20 +83,22 @@
 - 覆盖规则应用
 - 消息传递桥梁
 
-#### 3. Injected Script (`injected.js`)
-- 页面主世界上下文操作
-- 深度 Import Map 拦截
-- 动态创建监听
-- 全局 API 暴露
+#### 3. Service Worker (`background.js`)
+- 网络请求拦截和重定向
+- 动态规则管理
+- 跨页面覆盖规则应用
+- 后台持续运行
 
 ### 覆盖机制
 
 扩展通过以下方式实现 Import Map 覆盖：
 
-1. **优先级覆盖**：在页面头部插入新的 `<script type="importmap">` 标签
-2. **位置策略**：覆盖脚本插入在原始 Import Maps 之前，确保优先级
-3. **动态监听**：使用 MutationObserver 监听 DOM 变化，处理动态添加的 Import Maps
+1. **网络拦截**：使用 Service Worker 的 declarativeNetRequest API 拦截网络请求
+2. **URL 重定向**：将匹配的模块请求重定向到指定的新 URL
+3. **动态规则**：根据用户配置动态创建和更新拦截规则
 4. **持久化存储**：使用 Chrome Storage API 保存覆盖规则
+5. **多 CDN 支持**：自动匹配常见 CDN 的 URL 模式（esm.sh、skypack、unpkg 等）
+6. **智能依赖映射**：自动处理主包与依赖包的版本兼容性（如 Vue 与 vue-demi）
 
 ## 常见用例
 
@@ -145,7 +148,8 @@ import-map-overrider/
 ├── popup.html            # 弹窗界面
 ├── popup.js              # 弹窗逻辑
 ├── content.js            # 内容脚本
-├── injected.js           # 注入脚本
+├── background.js         # Service Worker
+├── test.html             # 测试页面
 └── README.md             # 说明文档
 ```
 
@@ -153,6 +157,8 @@ import-map-overrider/
 - `activeTab`：访问当前活动标签页
 - `storage`：存储覆盖规则
 - `scripting`：注入脚本到页面
+- `declarativeNetRequest`：拦截和重定向网络请求
+- `declarativeNetRequestWithHostAccess`：访问主机权限
 - `<all_urls>`：在所有网站上工作
 
 ## 故障排除
@@ -164,7 +170,20 @@ A: 确保：
 - 包名拼写正确
 - URL 格式正确且可访问
 - 页面确实使用了 Import Maps
-- 尝试刷新页面
+- **已刷新页面**（Service Worker 拦截需要页面重新加载）
+- 检查开发者工具的 Network 标签页，确认请求被重定向
+
+**Q: 更新包版本后出现依赖错误？**
+A: 这通常是依赖包版本不兼容导致的：
+- 扩展会自动处理常见的依赖映射（如 Vue 与 vue-demi、vue-router）
+- 如果仍有问题，可以手动添加依赖包的覆盖规则
+- 例如：将 `vue-demi` 覆盖为兼容的版本
+
+**Q: Vue Router 导出错误（useRouter 等）？**
+A: 这通常是构建版本不匹配导致的：
+- 扩展会在添加 Vue 覆盖时自动映射兼容的 vue-router 版本
+- Vue 3.x 需要使用 vue-router 4.x 的 ESM 浏览器构建版本
+- 手动添加时确保 URL 包含 `esm-browser.js` 后缀
 
 **Q: 检测不到 Import Maps？**
 A: 可能原因：
@@ -194,9 +213,23 @@ MIT License - 详见 LICENSE 文件
 
 ## 更新日志
 
+### v2.1.0
+- **新增功能**：智能依赖映射，自动处理包版本兼容性问题
+- 自动解决 Vue 与 vue-demi 版本不匹配导致的错误
+- 自动映射 Vue 3.x 对应的 vue-router 4.x ESM 浏览器版本
+- 增强 URL 模式匹配，支持更多路径格式
+- 添加详细的调试日志和错误处理指南
+
+### v2.0.0
+- **重大更新**：改用 Service Worker 网络拦截方式实现覆盖
+- 更稳定的覆盖机制，不受浏览器 Import Map 解析限制
+- 支持多种 CDN 的自动 URL 模式匹配
+- 优化用户界面，添加工作原理说明
+
 ### v1.0.0
 - 初始版本发布
 - 基本的 Import Map 检测和显示
-- 覆盖规则添加和管理
+- 覆盖规则添加和管理（基于 Import Map 注入）
 - 持久化存储支持
 - 动态 Import Map 监听
+

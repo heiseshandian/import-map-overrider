@@ -378,46 +378,43 @@ class ImportMapOverrider {
 
   async applyOverrides() {
     try {
-      const [tab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
+      // 通过 Service Worker 更新网络拦截规则
+      const response = await chrome.runtime.sendMessage({
+        type: 'UPDATE_OVERRIDES',
+        overrides: this.overrides
       });
 
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => {
-          const overrides = this.overrides ?? {};
+      if (response && response.success) {
+        console.log('Import Map Overrider: 已更新网络拦截规则', this.overrides);
+        
+        // 通知当前页面覆盖规则已更新（可选，用于显示状态）
+        try {
+          const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+          });
 
-          // 移除之前的覆盖脚本
-          const existingScript = document.getElementById(
-            "import-map-overrider-script"
-          );
-          if (existingScript) {
-            existingScript.remove();
-          }
-
-          if (Object.keys(overrides).length === 0) {
-            return;
-          }
-
-          // 创建新的 importmap 脚本来覆盖
-          const script = document.createElement("script");
-          script.type = "importmap";
-          script.id = "import-map-overrider-script";
-          script.textContent = JSON.stringify(
-            {
-              imports: overrides,
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (overrides) => {
+              // 触发自定义事件通知页面覆盖规则已更新
+              window.dispatchEvent(new CustomEvent('importMapOverrideUpdated', {
+                detail: { overrides }
+              }));
+              
+              console.log('Import Map Overrider: 网络拦截规则已生效，刷新页面后将使用新的模块 URL');
             },
-            null,
-            2
-          );
-
-          // 插入到 head 的最前面，确保优先级
-          document.head.insertBefore(script, document.head.firstChild);
-        },
-      });
+            args: [this.overrides]
+          });
+        } catch (scriptError) {
+          // 忽略脚本注入错误，不影响主要功能
+          console.warn('Import Map Overrider: 无法通知页面更新状态', scriptError);
+        }
+      } else {
+        console.error('Import Map Overrider: 更新网络拦截规则失败', response);
+      }
     } catch (error) {
-      console.error("应用覆盖规则失败:", error);
+      console.error('应用覆盖规则失败:', error);
     }
   }
 
