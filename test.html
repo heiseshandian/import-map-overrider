@@ -212,6 +212,9 @@
       <button class="button" onclick="testImport('dayjs')">
         测试 DayJS 导入
       </button>
+      <button class="button" onclick="testDirectUrlRedirect()">
+        测试精确 URL 重定向
+      </button>
       <button class="button" onclick="showCurrentImportMaps()">
         显示当前 Import Maps
       </button>
@@ -235,9 +238,10 @@
             导入"等按钮，观察导入的模块信息
           </li>
           <li>
-            <strong>添加覆盖</strong>：使用扩展添加覆盖规则，例如：
+            <strong>添加精确重定向</strong>：使用扩展添加 URL 重定向规则，例如：
             <ul>
-              <li>包名：<code>react</code></li>
+              <li>规则名称：<code>react-redirect</code></li>
+              <li>旧 URL：<code>https://esm.sh/react@18.2.0</code></li>
               <li>新 URL：<code>https://cdn.skypack.dev/react@17.0.2</code></li>
             </ul>
           </li>
@@ -246,8 +250,7 @@
             拦截生效
           </li>
           <li>
-            <strong>验证覆盖</strong>：再次点击"测试 React
-            导入"，检查是否使用了新的 URL
+            <strong>验证覆盖</strong>：再次点击测试按钮，检查是否使用了新的 URL
           </li>
           <li>
             <strong>查看变化</strong>：点击"显示当前 Import
@@ -256,14 +259,8 @@
           </li>
         </ol>
         <p>
-          <strong>💡 工作原理：</strong>扩展现在使用 Service Worker
-          模式拦截网络请求并重定向到新的 URL，这比之前的 Import Map
-          注入方式更加稳定可靠。
-        </p>
-        <p>
-          <strong>🔗 智能依赖：</strong
-          >扩展会自动处理相关依赖包的版本兼容性，如将 Vue 3.5.16 与兼容的
-          vue-demi 版本自动匹配。
+          <strong>💡 工作原理：</strong>扩展使用 Service Worker
+          拦截网络请求并进行精确的 URL 重定向，实现模块的替换。
         </p>
       </div>
     </div>
@@ -414,6 +411,60 @@
 
       window.clearOutput = function () {
         document.getElementById("output").textContent = "输出已清空...\n";
+      };
+
+      window.testDirectUrlRedirect = async function () {
+        const output = document.getElementById("output");
+        output.textContent += "\n🎯 测试精确 URL 重定向功能...\n";
+        output.textContent += "📋 这个测试会尝试加载一个特定的 URL\n";
+        output.textContent += "💡 如果配置了精确重定向规则，应该会重定向到新的 URL\n\n";
+        
+        try {
+          // 测试加载一个特定的 URL
+          const testUrl = 'https://esm.sh/lodash@4.17.21';
+          output.textContent += `🔗 尝试加载: ${testUrl}\n`;
+          
+          // 创建一个动态导入来测试重定向
+          const startTime = Date.now();
+          const module = await import(testUrl);
+          const loadTime = Date.now() - startTime;
+          
+          output.textContent += `✅ 加载成功！耗时: ${loadTime}ms\n`;
+          output.textContent += `📦 模块信息: ${typeof module}\n`;
+          
+          if (module.default) {
+            output.textContent += `🔧 默认导出: ${typeof module.default}\n`;
+            if (typeof module.default === 'function') {
+              output.textContent += `📝 函数名: ${module.default.name || '匿名函数'}\n`;
+            }
+          }
+          
+          // 检查是否有常见的 lodash 方法
+          const commonMethods = ['map', 'filter', 'reduce', 'forEach'];
+          const availableMethods = commonMethods.filter(method => 
+            module.default && typeof module.default[method] === 'function'
+          );
+          
+          if (availableMethods.length > 0) {
+            output.textContent += `🛠️  可用方法: ${availableMethods.join(', ')}\n`;
+          }
+          
+          output.textContent += "\n💡 提示: 如果配置了精确重定向规则，实际加载的可能是重定向后的 URL\n";
+          output.textContent += "🔍 检查网络面板可以看到实际的请求和重定向\n";
+          
+        } catch (error) {
+          output.textContent += `❌ 加载失败: ${error.message}\n`;
+          output.textContent += `🔍 错误类型: ${error.name}\n`;
+          
+          if (error.message.includes('CORS')) {
+            output.textContent += "🚨 CORS 错误: 这可能是由于跨域限制导致的\n";
+          } else if (error.message.includes('network')) {
+            output.textContent += "🌐 网络错误: 请检查网络连接\n";
+          }
+        }
+        
+        output.textContent += "\n" + "=".repeat(50) + "\n";
+        output.scrollTop = output.scrollHeight;
       };
 
       let dynamicImportMapAdded = false;

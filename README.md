@@ -16,6 +16,7 @@
 - 覆盖规则持久化存储，跨页面生效
 - 使用 Service Worker 拦截网络请求实现覆盖
 - 🔗 **智能依赖处理**：自动处理相关依赖包的版本兼容性
+- 🎯 **精确 URL 重定向**：支持直接从 oldUrl 307 重定向到 newUrl
 
 ### 🎯 开发者友好
 - 直观的用户界面，易于使用
@@ -42,9 +43,12 @@
 4. 点击任何包旁边的"覆盖"按钮来快速设置覆盖规则
 
 ### 添加覆盖规则
+
+#### 🎯 精确 URL 重定向模式
 1. 在"添加覆盖规则"区域填写：
-   - **包名**：要覆盖的包名（如 `react`、`lodash`）
-   - **新的 URL**：新的包地址（如 `https://esm.sh/react@18.2.0`）
+   - **规则名称**：自定义规则名称（如 `my-redirect-rule`）
+   - **旧 URL**：要重定向的完整 URL（如 `https://esm.sh/lodash@4.17.21`）
+   - **新 URL**：目标 URL（如 `https://cdn.skypack.dev/lodash@4.17.21`）
 2. 点击"添加覆盖"按钮
 3. **刷新页面**使 Service Worker 拦截规则生效
 
@@ -97,8 +101,7 @@
 2. **URL 重定向**：将匹配的模块请求重定向到指定的新 URL
 3. **动态规则**：根据用户配置动态创建和更新拦截规则
 4. **持久化存储**：使用 Chrome Storage API 保存覆盖规则
-5. **多 CDN 支持**：自动匹配常见 CDN 的 URL 模式（esm.sh、skypack、unpkg 等）
-6. **智能依赖映射**：自动处理主包与依赖包的版本兼容性（如 Vue 与 vue-demi）
+5. **精确匹配**：直接匹配完整 URL，确保精确控制
 
 ## 常见用例
 
@@ -129,8 +132,8 @@
 ### 3. CDN 切换
 ```javascript
 // 从一个 CDN 切换到另一个
-"lodash": "https://cdn.skypack.dev/lodash"     // 原始
-"lodash": "https://esm.sh/lodash"             // 切换 CDN
+// 旧 URL: "https://cdn.skypack.dev/lodash@4.17.21"
+// 新 URL: "https://esm.sh/lodash@4.17.21"
 ```
 
 ## 兼容性
@@ -175,15 +178,14 @@ A: 确保：
 
 **Q: 更新包版本后出现依赖错误？**
 A: 这通常是依赖包版本不兼容导致的：
-- 扩展会自动处理常见的依赖映射（如 Vue 与 vue-demi、vue-router）
-- 如果仍有问题，可以手动添加依赖包的覆盖规则
-- 例如：将 `vue-demi` 覆盖为兼容的版本
+- 需要手动添加依赖包的覆盖规则
+- 例如：将 `vue-demi` 的完整 URL 重定向为兼容的版本
 
 **Q: Vue Router 导出错误（useRouter 等）？**
 A: 这通常是构建版本不匹配导致的：
-- 扩展会在添加 Vue 覆盖时自动映射兼容的 vue-router 版本
+- 需要手动添加 vue-router 的重定向规则
 - Vue 3.x 需要使用 vue-router 4.x 的 ESM 浏览器构建版本
-- 手动添加时确保 URL 包含 `esm-browser.js` 后缀
+- 确保新 URL 包含 `esm-browser.js` 后缀
 
 **Q: 检测不到 Import Maps？**
 A: 可能原因：
@@ -213,17 +215,15 @@ MIT License - 详见 LICENSE 文件
 
 ## 更新日志
 
-### v2.1.0
-- **新增功能**：智能依赖映射，自动处理包版本兼容性问题
-- 自动解决 Vue 与 vue-demi 版本不匹配导致的错误
-- 自动映射 Vue 3.x 对应的 vue-router 4.x ESM 浏览器版本
-- 增强 URL 模式匹配，支持更多路径格式
-- 添加详细的调试日志和错误处理指南
+### v3.0.0
+- **重大更新**：简化为精确 URL 重定向模式
+- 移除包名映射功能，专注于精确 URL 控制
+- 更直观的用户界面和使用方式
+- 提高重定向的可预测性和准确性
 
 ### v2.0.0
 - **重大更新**：改用 Service Worker 网络拦截方式实现覆盖
 - 更稳定的覆盖机制，不受浏览器 Import Map 解析限制
-- 支持多种 CDN 的自动 URL 模式匹配
 - 优化用户界面，添加工作原理说明
 
 ### v1.0.0

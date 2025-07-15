@@ -302,18 +302,22 @@
   <div class="section override-section">
     <div class="section-title">添加覆盖规则</div>
     <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px; padding: 8px; margin-bottom: 12px; font-size: 11px; color: #1565c0;">
-      💡 <strong>工作原理：</strong>使用 Service Worker 拦截网络请求并重定向到新 URL。
-      <br>🔗 <strong>智能依赖：</strong>自动处理相关依赖包的版本兼容性（如 Vue 与 vue-demi）。
+      🎯 <strong>精确重定向：</strong>直接从旧 URL 307 重定向到新 URL
+      <br>📋 <strong>必填字段：</strong>规则名称、旧 URL、新 URL 都为必填项
       <br>⚠️ <strong>重要提醒：</strong>添加覆盖规则后，请<strong>刷新页面</strong>使其生效。
     </div>
     <div class="override-form">
       <div class="form-group">
-        <label class="form-label">包名</label>
-        <input type="text" class="form-input" id="packageName" placeholder="例如: react">
+        <label class="form-label">规则名称</label>
+        <input type="text" class="form-input" id="packageName" placeholder="例如: react 或 my-redirect-rule">
       </div>
       <div class="form-group">
-        <label class="form-label">新的 URL</label>
-        <input type="text" class="form-input" id="packageUrl" placeholder="例如: https://esm.sh/react@18.2.0">
+        <label class="form-label">旧 URL（必填）</label>
+        <input type="text" class="form-input" id="oldUrl" placeholder="例如: https://esm.sh/react@18.2.0" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">新 URL</label>
+        <input type="text" class="form-input" id="newUrl" placeholder="例如: https://esm.sh/react@18.2.0">
       </div>
       <div class="form-actions">
         <button class="btn-primary" id="addOverride">添加覆盖</button>

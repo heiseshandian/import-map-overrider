@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Import Map Overrider",
-  "version": "1.0.0",
-  "description": "显示和覆盖页面的 Import Maps",
+  "version": "2.0.0",
+  "description": "Import Map Overrider - 精确 URL 重定向的模块覆盖扩展",
   "permissions": [
     "activeTab",
     "storage",
@@ -10,9 +10,7 @@
     "declarativeNetRequest",
     "declarativeNetRequestWithHostAccess"
   ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Import Map Overrider"

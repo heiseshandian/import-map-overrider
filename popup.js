@@ -301,25 +301,41 @@ class ImportMapOverrider {
 
   quickOverride(name, url) {
     document.getElementById("packageName").value = name;
-    document.getElementById("packageUrl").value = url;
+    document.getElementById("oldUrl").value = url;
+    document.getElementById("newUrl").value = url;
   }
 
   async addOverride() {
     const packageName = document.getElementById("packageName").value.trim();
-    const packageUrl = document.getElementById("packageUrl").value.trim();
+    const oldUrl = document.getElementById("oldUrl").value.trim();
+    const newUrl = document.getElementById("newUrl").value.trim();
 
-    if (!packageName || !packageUrl) {
-      alert("请填写包名和 URL");
+    // 检查必填字段
+    if (!packageName) {
+      alert("请填写规则名称");
+      return;
+    }
+    
+    if (!oldUrl) {
+      alert("旧 URL 为必填项");
+      return;
+    }
+    
+    if (!newUrl) {
+      alert("请填写新 URL");
       return;
     }
 
-    this.overrides[packageName] = packageUrl;
+    // 只支持新格式：URL 重定向
+    this.overrides[packageName] = { oldUrl, newUrl };
+
     await this.saveOverrides();
     await this.applyOverrides();
 
     // 清空输入框
     document.getElementById("packageName").value = "";
-    document.getElementById("packageUrl").value = "";
+    document.getElementById("oldUrl").value = "";
+    document.getElementById("newUrl").value = "";
 
     this.renderOverrides();
   }
@@ -357,19 +373,21 @@ class ImportMapOverrider {
       <div class="overrides-list">
         ${overrideEntries
           .map(
-            ([name, url]) => `
-          <div class="override-item">
-            <div>
-              <div class="import-name">${this.escapeHtml(name)}</div>
-              <div class="import-url">${this.escapeHtml(url)}</div>
-            </div>
-            <button class="remove-btn" data-package-name="${this.escapeHtml(
-              name
-            )}">
-              删除
-            </button>
-          </div>
-        `
+            ([name, override]) => {
+              // 只支持新格式：URL 重定向
+              return `
+                <div class="override-item">
+                  <div>
+                    <div class="import-name">${this.escapeHtml(name)}</div>
+                    <div class="import-url" style="font-size: 10px; color: #888;">从: ${this.escapeHtml(override.oldUrl)}</div>
+                    <div class="import-url">到: ${this.escapeHtml(override.newUrl)}</div>
+                  </div>
+                  <button class="remove-btn" data-package-name="${this.escapeHtml(name)}">
+                    删除
+                  </button>
+                </div>
+              `;
+            }
           )
           .join("")}
       </div>
