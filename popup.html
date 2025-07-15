@@ -1,336 +1,369 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body {
-      width: 500px;
-      min-height: 400px;
-      margin: 0;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-    }
-    
-    .refresh-btn {
-      background: #4285f4;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    
-    .refresh-btn:hover {
-      background: #3367d6;
-    }
-    
-    .section {
-      margin-bottom: 20px;
-    }
-    
-    .section-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    
-    .import-map-item {
-      background: #f8f9fa;
-      border: 1px solid #e8eaed;
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-    
-    .import-map-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    
-    .import-map-type {
-      font-weight: 500;
-      color: #1a73e8;
-    }
-    
-    .toggle-btn {
-      background: none;
-      border: 1px solid #dadce0;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    
-    .import-list {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    
-    .import-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .import-item:last-child {
-      border-bottom: none;
-    }
-    
-    .import-name {
-      font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 12px;
-      color: #d73a49;
-      font-weight: 500;
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .import-url {
-      font-family: 'Monaco', 'Menlo', monospace;
-      font-size: 11px;
-      color: #666;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .override-btn {
-      background: #34a853;
-      color: white;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 10px;
-    }
-    
-    .override-btn:hover {
-      background: #2d8f47;
-    }
-    
-    .override-section {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      border-radius: 6px;
-      padding: 12px;
-    }
-    
-    .override-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    
-    .form-label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #555;
-    }
-    
-    .form-input {
-      padding: 6px 8px;
-      border: 1px solid #dadce0;
-      border-radius: 4px;
-      font-size: 12px;
-      font-family: 'Monaco', 'Menlo', monospace;
-    }
-    
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    
-    .btn-primary {
-      background: #1a73e8;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    
-    .btn-secondary {
-      background: #f8f9fa;
-      color: #5f6368;
-      border: 1px solid #dadce0;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    
-    .empty-state {
-      text-align: center;
-      color: #666;
-      padding: 40px 20px;
-    }
-    
-    .overrides-list {
-      max-height: 150px;
-      overflow-y: auto;
-    }
-    
-    .override-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px;
-      background: #e8f0fe;
-      border-radius: 4px;
-      margin-bottom: 4px;
-    }
-    
-    .remove-btn {
-      background: #ea4335;
-      color: white;
-      border: none;
-      padding: 2px 6px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 10px;
-    }
-    
-    .search-container {
-      position: relative;
-      margin-bottom: 12px;
-    }
-    
-    .search-input {
-      width: 100%;
-      padding: 8px 32px 8px 12px;
-      border: 1px solid #dadce0;
-      border-radius: 6px;
-      font-size: 13px;
-      box-sizing: border-box;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    
-    .search-input:focus {
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
-    }
-    
-    .clear-search-btn {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #666;
-      cursor: pointer;
-      font-size: 16px;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: background-color 0.2s;
-    }
-    
-    .clear-search-btn:hover {
-      background-color: #f1f3f4;
-    }
-    
-    .clear-search-btn:hidden {
-      display: none;
-    }
-    
-    .import-map-item.hidden {
-      display: none;
-    }
-    
-    .import-item.hidden {
-      display: none;
-    }
-    
-    .no-results {
-      text-align: center;
-      color: #666;
-      padding: 20px;
-      font-size: 13px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="title">Import Map Overrider</div>
-    <button class="refresh-btn" id="refreshBtn">刷新</button>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">当前页面的 Import Maps</div>
-    <div class="search-container">
-      <input type="text" class="search-input" id="searchInput" placeholder="搜索包名或URL...">
-      <button class="clear-search-btn" id="clearSearchBtn">×</button>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 500px;
+        min-height: 400px;
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        font-size: 14px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .refresh-btn {
+        background: #4285f4;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .refresh-btn:hover {
+        background: #3367d6;
+      }
+
+      .section {
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #555;
+      }
+
+      .import-map-item {
+        background: #f8f9fa;
+        border: 1px solid #e8eaed;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 8px;
+      }
+
+      .import-map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .import-map-type {
+        font-weight: 500;
+        color: #1a73e8;
+      }
+
+      .toggle-btn {
+        background: none;
+        border: 1px solid #dadce0;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+      }
+
+      .import-list {
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .import-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .import-item:last-child {
+        border-bottom: none;
+      }
+
+      .import-name {
+        font-family: "Monaco", "Menlo", monospace;
+        font-size: 12px;
+        color: #d73a49;
+        font-weight: 500;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .import-url {
+        font-family: "Monaco", "Menlo", monospace;
+        font-size: 11px;
+        color: #666;
+        max-width: 400px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .override-btn {
+        background: #34a853;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 10px;
+      }
+
+      .override-btn:hover {
+        background: #2d8f47;
+      }
+
+      .override-section {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        padding: 12px;
+      }
+
+      .override-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .form-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .form-input {
+        padding: 6px 8px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: "Monaco", "Menlo", monospace;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .btn-primary {
+        background: #1a73e8;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .btn-secondary {
+        background: #f8f9fa;
+        color: #5f6368;
+        border: 1px solid #dadce0;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: #666;
+        padding: 40px 20px;
+      }
+
+      .overrides-list {
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .override-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        background: #e8f0fe;
+        border-radius: 4px;
+        margin-bottom: 4px;
+      }
+
+      .remove-btn {
+        background: #ea4335;
+        color: white;
+        border: none;
+        padding: 2px 6px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 10px;
+      }
+
+      .search-container {
+        position: relative;
+        margin-bottom: 12px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 8px 32px 8px 12px;
+        border: 1px solid #dadce0;
+        border-radius: 6px;
+        font-size: 13px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .search-input:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+      }
+
+      .clear-search-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 16px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+      }
+
+      .clear-search-btn:hover {
+        background-color: #f1f3f4;
+      }
+
+      .clear-search-btn:hidden {
+        display: none;
+      }
+
+      .import-map-item.hidden {
+        display: none;
+      }
+
+      .import-item.hidden {
+        display: none;
+      }
+
+      .no-results {
+        text-align: center;
+        color: #666;
+        padding: 20px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="title">Import Map Overrider</div>
+      <button class="refresh-btn" id="refreshBtn">刷新</button>
     </div>
-    <div id="importMaps"></div>
-  </div>
-  
-  <div class="section override-section">
-    <div class="section-title">添加覆盖规则</div>
-    <div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 4px; padding: 8px; margin-bottom: 12px; font-size: 11px; color: #1565c0;">
-      🎯 <strong>精确重定向：</strong>直接从旧 URL 307 重定向到新 URL
-      <br>📋 <strong>必填字段：</strong>规则名称、旧 URL、新 URL 都为必填项
-      <br>⚠️ <strong>重要提醒：</strong>添加覆盖规则后，请<strong>刷新页面</strong>使其生效。
+
+    <div class="section">
+      <div class="section-title">当前页面的 Import Maps</div>
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="搜索包名或URL..."
+        />
+        <button class="clear-search-btn" id="clearSearchBtn">×</button>
+      </div>
+      <div id="importMaps"></div>
     </div>
-    <div class="override-form">
-      <div class="form-group">
-        <label class="form-label">规则名称</label>
-        <input type="text" class="form-input" id="packageName" placeholder="例如: react 或 my-redirect-rule">
+
+    <div class="section override-section">
+      <div class="section-title">添加覆盖规则</div>
+      <div
+        style="
+          background: #e3f2fd;
+          border: 1px solid #90caf9;
+          border-radius: 4px;
+          padding: 8px;
+          margin-bottom: 12px;
+          font-size: 11px;
+          color: #1565c0;
+        "
+      >
+        🎯 <strong>精确重定向：</strong>直接从旧 URL 307 重定向到新 URL <br />📋
+        <strong>必填字段：</strong>规则名称、旧 URL、新 URL 都为必填项 <br />⚠️
+        <strong>重要提醒：</strong
+        >添加覆盖规则后，请<strong>刷新页面</strong>使其生效。
       </div>
-      <div class="form-group">
-        <label class="form-label">旧 URL（必填）</label>
-        <input type="text" class="form-input" id="oldUrl" placeholder="例如: https://esm.sh/react@18.2.0" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">新 URL</label>
-        <input type="text" class="form-input" id="newUrl" placeholder="例如: https://esm.sh/react@18.2.0">
-      </div>
-      <div class="form-actions">
-        <button class="btn-primary" id="addOverride">添加覆盖</button>
-        <button class="btn-secondary" id="clearAll">清除所有</button>
+      <div class="override-form">
+        <div class="form-group">
+          <label class="form-label">规则名称</label>
+          <input
+            type="text"
+            class="form-input"
+            id="packageName"
+            placeholder="例如: react 或 my-redirect-rule"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">旧 URL（必填）</label>
+          <input
+            type="text"
+            class="form-input"
+            id="oldUrl"
+            placeholder="例如: https://esm.sh/react@18.2.0"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">新 URL</label>
+          <input
+            type="text"
+            class="form-input"
+            id="newUrl"
+            placeholder="例如: https://esm.sh/react@18.2.0"
+          />
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" id="addOverride">添加覆盖</button>
+          <button class="btn-secondary" id="clearAll">清除所有</button>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div class="section">
-    <div class="section-title">当前覆盖规则</div>
-    <div id="overridesList"></div>
-  </div>
-  
-  <script src="popup.js"></script>
-</body>
+
+    <div class="section">
+      <div class="section-title">当前覆盖规则</div>
+      <div id="overridesList"></div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
 </html>
