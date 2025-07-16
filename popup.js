@@ -25,6 +25,22 @@ class ImportMapOverrider {
       this.clearAllOverrides();
     });
 
+    document
+      .getElementById("selectForCompareBtn")
+      .addEventListener("click", () => {
+        this.selectForCompare();
+      });
+
+    document
+      .getElementById("compareWithSelectedBtn")
+      .addEventListener("click", () => {
+        this.compareWithSelected();
+      });
+
+    document.getElementById("closeCompareBtn").addEventListener("click", () => {
+      this.closeCompareResults();
+    });
+
     // 搜索功能
     const searchInput = document.getElementById("searchInput");
     const clearSearchBtn = document.getElementById("clearSearchBtn");
@@ -315,12 +331,12 @@ class ImportMapOverrider {
       alert("请填写规则名称");
       return;
     }
-    
+
     if (!oldUrl) {
       alert("旧 URL 为必填项");
       return;
     }
-    
+
     if (!newUrl) {
       alert("请填写新 URL");
       return;
@@ -372,23 +388,27 @@ class ImportMapOverrider {
     container.innerHTML = `
       <div class="overrides-list">
         ${overrideEntries
-          .map(
-            ([name, override]) => {
-              // 只支持新格式：URL 重定向
-              return `
+          .map(([name, override]) => {
+            // 只支持新格式：URL 重定向
+            return `
                 <div class="override-item">
                   <div>
                     <div class="import-name">${this.escapeHtml(name)}</div>
-                    <div class="import-url" style="font-size: 10px; color: #888;">从: ${this.escapeHtml(override.oldUrl)}</div>
-                    <div class="import-url">到: ${this.escapeHtml(override.newUrl)}</div>
+                    <div class="import-url" style="font-size: 10px; color: #888;">从: ${this.escapeHtml(
+                      override.oldUrl
+                    )}</div>
+                    <div class="import-url">到: ${this.escapeHtml(
+                      override.newUrl
+                    )}</div>
                   </div>
-                  <button class="remove-btn" data-package-name="${this.escapeHtml(name)}">
+                  <button class="remove-btn" data-package-name="${this.escapeHtml(
+                    name
+                  )}">
                     删除
                   </button>
                 </div>
               `;
-            }
-          )
+          })
           .join("")}
       </div>
     `;
@@ -398,13 +418,13 @@ class ImportMapOverrider {
     try {
       // 通过 Service Worker 更新网络拦截规则
       const response = await chrome.runtime.sendMessage({
-        type: 'UPDATE_OVERRIDES',
-        overrides: this.overrides
+        type: "UPDATE_OVERRIDES",
+        overrides: this.overrides,
       });
 
       if (response && response.success) {
-        console.log('Import Map Overrider: 已更新网络拦截规则', this.overrides);
-        
+        console.log("Import Map Overrider: 已更新网络拦截规则", this.overrides);
+
         // 通知当前页面覆盖规则已更新（可选，用于显示状态）
         try {
           const [tab] = await chrome.tabs.query({
@@ -416,23 +436,30 @@ class ImportMapOverrider {
             target: { tabId: tab.id },
             func: (overrides) => {
               // 触发自定义事件通知页面覆盖规则已更新
-              window.dispatchEvent(new CustomEvent('importMapOverrideUpdated', {
-                detail: { overrides }
-              }));
-              
-              console.log('Import Map Overrider: 网络拦截规则已生效，刷新页面后将使用新的模块 URL');
+              window.dispatchEvent(
+                new CustomEvent("importMapOverrideUpdated", {
+                  detail: { overrides },
+                })
+              );
+
+              console.log(
+                "Import Map Overrider: 网络拦截规则已生效，刷新页面后将使用新的模块 URL"
+              );
             },
-            args: [this.overrides]
+            args: [this.overrides],
           });
         } catch (scriptError) {
           // 忽略脚本注入错误，不影响主要功能
-          console.warn('Import Map Overrider: 无法通知页面更新状态', scriptError);
+          console.warn(
+            "Import Map Overrider: 无法通知页面更新状态",
+            scriptError
+          );
         }
       } else {
-        console.error('Import Map Overrider: 更新网络拦截规则失败', response);
+        console.error("Import Map Overrider: 更新网络拦截规则失败", response);
       }
     } catch (error) {
-      console.error('应用覆盖规则失败:', error);
+      console.error("应用覆盖规则失败:", error);
     }
   }
 
@@ -467,6 +494,206 @@ class ImportMapOverrider {
         <div style="color: #ea4335;">${message}</div>
       </div>
     `;
+  }
+
+  async selectForCompare() {
+    try {
+      // 获取当前页面的importmap数据
+      const currentImportMaps = {};
+      this.importMaps.forEach((importMap) => {
+        if (importMap.content && importMap.content.imports) {
+          Object.assign(currentImportMaps, importMap.content.imports);
+        }
+      });
+
+      // Debug: 可以在开发时取消注释
+      // console.log('Selected Import Map:', currentImportMaps);
+      // console.log('Import Maps count:', Object.keys(currentImportMaps).length);
+
+      // 存储到chrome.storage.local
+      await chrome.storage.local.set({ selectedImportMap: currentImportMaps });
+
+      // 显示成功消息
+      this.showSuccess(
+        `当前页面的 Import Map 已选择用于比较 (${
+          Object.keys(currentImportMaps).length
+        } 个包)`
+      );
+    } catch (error) {
+      this.showError("选择 Import Map 失败: " + error.message);
+    }
+  }
+
+  async compareWithSelected() {
+    try {
+      // 获取之前存储的importmap
+      const result = await chrome.storage.local.get(["selectedImportMap"]);
+      const selectedImportMap = result.selectedImportMap;
+
+      if (!selectedImportMap) {
+        this.showError("请先选择一个 Import Map 用于比较");
+        return;
+      }
+
+      // 获取当前页面的importmap
+      const currentImportMaps = {};
+      this.importMaps.forEach((importMap) => {
+        if (importMap.content && importMap.content.imports) {
+          Object.assign(currentImportMaps, importMap.content.imports);
+        }
+      });
+
+      // Debug: 可以在开发时取消注释
+      // console.log('Selected Import Map:', selectedImportMap);
+      // console.log('Current Import Map:', currentImportMaps);
+      // console.log('Selected keys:', Object.keys(selectedImportMap));
+      // console.log('Current keys:', Object.keys(currentImportMaps));
+
+      // 比较两个importmap
+      const diff = this.compareImportMaps(selectedImportMap, currentImportMaps);
+
+      // console.log('Diff result:', diff);
+
+      // 显示比较结果
+      this.displayCompareResults(diff);
+    } catch (error) {
+      this.showError("比较 Import Map 失败: " + error.message);
+    }
+  }
+
+  compareImportMaps(selected, current) {
+    const diff = {
+      added: {},
+      removed: {},
+      changed: {},
+    };
+
+    // 确保输入参数是对象
+    if (!selected || typeof selected !== "object") {
+      console.warn("Selected import map is not a valid object:", selected);
+      selected = {};
+    }
+    if (!current || typeof current !== "object") {
+      console.warn("Current import map is not a valid object:", current);
+      current = {};
+    }
+
+    // Debug: 可以在开发时取消注释
+    // console.log('Comparing:', {
+    //   selectedKeys: Object.keys(selected),
+    //   currentKeys: Object.keys(current),
+    //   selectedCount: Object.keys(selected).length,
+    //   currentCount: Object.keys(current).length
+    // });
+
+    // 找出新增的包
+    for (const [name, url] of Object.entries(current)) {
+      if (!selected.hasOwnProperty(name)) {
+        diff.added[name] = url;
+        // console.log('Added:', name, url);
+      } else if (selected[name] !== url) {
+        diff.changed[name] = {
+          old: selected[name],
+          new: url,
+        };
+        // console.log('Changed:', name, 'from', selected[name], 'to', url);
+      }
+    }
+
+    // 找出删除的包
+    for (const [name, url] of Object.entries(selected)) {
+      if (!current.hasOwnProperty(name)) {
+        diff.removed[name] = url;
+        // console.log('Removed:', name, url);
+      }
+    }
+
+    // console.log('Final diff:', diff);
+    return diff;
+  }
+
+  displayCompareResults(diff) {
+    const compareSection = document.getElementById("compareSection");
+    const compareResults = document.getElementById("compareResults");
+
+    // console.log('Displaying results for diff:', diff);
+
+    let html = "";
+
+    const addedCount = Object.keys(diff.added).length;
+    const removedCount = Object.keys(diff.removed).length;
+    const changedCount = Object.keys(diff.changed).length;
+
+    // console.log('Counts:', { addedCount, removedCount, changedCount });
+
+    if (addedCount === 0 && removedCount === 0 && changedCount === 0) {
+      html =
+        "<div style='text-align: center; color: #28a745; padding: 20px;'>✅ 两个 Import Map 完全相同</div>";
+    } else {
+      // 添加总结信息
+      html += `<div style='background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 13px;'>`;
+      html += `📊 <strong>比较结果总结:</strong> `;
+      if (addedCount > 0) html += `新增 ${addedCount} 个包 `;
+      if (removedCount > 0) html += `删除 ${removedCount} 个包 `;
+      if (changedCount > 0) html += `变更 ${changedCount} 个包`;
+      html += `</div>`;
+      if (Object.keys(diff.added).length > 0) {
+        html +=
+          "<h4 style='color: #155724; margin: 12px 0 8px 0;'>🆕 新增的包:</h4>";
+        for (const [name, url] of Object.entries(diff.added)) {
+          html += `<div class='diff-item diff-added'>+ ${this.escapeHtml(
+            name
+          )}: ${this.escapeHtml(url)}</div>`;
+        }
+      }
+
+      if (Object.keys(diff.removed).length > 0) {
+        html +=
+          "<h4 style='color: #721c24; margin: 12px 0 8px 0;'>🗑️ 删除的包:</h4>";
+        for (const [name, url] of Object.entries(diff.removed)) {
+          html += `<div class='diff-item diff-removed'>- ${this.escapeHtml(
+            name
+          )}: ${this.escapeHtml(url)}</div>`;
+        }
+      }
+
+      if (Object.keys(diff.changed).length > 0) {
+        html +=
+          "<h4 style='color: #856404; margin: 12px 0 8px 0;'>🔄 版本变更的包:</h4>";
+        for (const [name, change] of Object.entries(diff.changed)) {
+          html += `<div class='diff-item diff-changed'>~ ${this.escapeHtml(
+            name
+          )}:</div>`;
+          html += `<div class='diff-item diff-removed' style='margin-left: 20px;'>- ${this.escapeHtml(
+            change.old
+          )}</div>`;
+          html += `<div class='diff-item diff-added' style='margin-left: 20px;'>+ ${this.escapeHtml(
+            change.new
+          )}</div>`;
+        }
+      }
+    }
+
+    compareResults.innerHTML = html;
+    compareSection.style.display = "block";
+
+    // 滚动到比较结果区域
+    compareSection.scrollIntoView({ behavior: "smooth" });
+  }
+
+  closeCompareResults() {
+    document.getElementById("compareSection").style.display = "none";
+  }
+
+  showSuccess(message) {
+    const successDiv = document.createElement("div");
+    successDiv.style.cssText = `
+      position: fixed; top: 10px; right: 10px; background: #4caf50; color: white;
+      padding: 10px; border-radius: 4px; z-index: 1000;
+    `;
+    successDiv.textContent = message;
+    document.body.appendChild(successDiv);
+    setTimeout(() => successDiv.remove(), 3000);
   }
 }
 

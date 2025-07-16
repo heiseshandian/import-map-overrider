@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <style>
       body {
-        width: 500px;
+        width: 520px;
         min-height: 400px;
         margin: 0;
         padding: 16px;
@@ -32,7 +32,7 @@
         background: #4285f4;
         color: white;
         border: none;
-        padding: 6px 12px;
+        padding: 6px;
         border-radius: 4px;
         cursor: pointer;
         font-size: 12px;
@@ -283,12 +283,70 @@
         padding: 20px;
         font-size: 13px;
       }
+
+      .compare-section {
+        background: #f0f8ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .diff-item {
+        font-family: "Monaco", "Menlo", monospace;
+        font-size: 12px;
+        padding: 4px 8px;
+        margin: 2px 0;
+        border-radius: 3px;
+      }
+
+      .diff-added {
+        background: #d4edda;
+        color: #155724;
+        border-left: 3px solid #28a745;
+      }
+
+      .diff-removed {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 3px solid #dc3545;
+      }
+
+      .diff-changed {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 3px solid #ffc107;
+      }
+
+      .close-compare-btn {
+        float: right;
+        background: none;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        color: #666;
+      }
     </style>
   </head>
   <body>
     <div class="header">
       <div class="title">Import Map Overrider</div>
-      <button class="refresh-btn" id="refreshBtn">刷新</button>
+      <div style="display: flex; gap: 4px">
+        <button class="refresh-btn" id="selectForCompareBtn">
+          Select for Compare
+        </button>
+        <button class="refresh-btn" id="compareWithSelectedBtn">
+          Compare with Selected
+        </button>
+        <button class="refresh-btn" id="refreshBtn">Refresh</button>
+      </div>
+    </div>
+
+    <div class="compare-section" id="compareSection">
+      <button class="close-compare-btn" id="closeCompareBtn">×</button>
+      <div class="section-title">Import Map 比较结果</div>
+      <div id="compareResults"></div>
     </div>
 
     <div class="section">
