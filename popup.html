@@ -197,7 +197,7 @@
       }
 
       .overrides-list {
-        max-height: 150px;
+        max-height: 200px;
         overflow-y: auto;
       }
 
@@ -376,10 +376,11 @@
           color: #1565c0;
         "
       >
-        🎯 <strong>Precise Redirection:</strong> Direct 307 redirect from old URL to new URL <br />📋
-          <strong>Required Fields:</strong> Rule name, old URL, and new URL are all required <br />⚠️
-          <strong>Important Reminder:</strong
-          > After adding override rules, please <strong>refresh the page</strong> for them to take effect.
+        🎯 <strong>Precise Redirection:</strong> Direct 307 redirect from old
+        URL to new URL <br />📋 <strong>Required Fields:</strong> Rule name, old
+        URL, and new URL are all required <br />⚠️
+        <strong>Important Reminder:</strong> After adding override rules, please
+        <strong>refresh the page</strong> for them to take effect.
       </div>
       <div class="override-form">
         <div class="form-group">
@@ -412,13 +413,25 @@
         </div>
         <div class="form-actions">
           <button class="btn-primary" id="addOverride">Add Override</button>
-        <button class="btn-secondary" id="clearAll">Clear All</button>
+          <button class="btn-secondary" id="clearAll">Clear All</button>
+          <button class="btn-secondary" id="applyChanges" style="display: none">
+            Apply Changes
+          </button>
         </div>
       </div>
     </div>
 
     <div class="section">
       <div class="section-title">Current Override Rules</div>
+      <div class="search-container">
+        <input
+          type="text"
+          id="overrideSearchInput"
+          class="search-input"
+          placeholder="Search override rules..."
+        />
+        <button id="clearOverrideSearchBtn" class="clear-search-btn">×</button>
+      </div>
       <div id="overridesList"></div>
     </div>
 

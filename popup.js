@@ -25,6 +25,10 @@ class ImportMapOverrider {
       this.clearAllOverrides();
     });
 
+    document.getElementById("applyChanges").addEventListener("click", () => {
+      this.applyChangesFromComparison();
+    });
+
     document
       .getElementById("selectForCompareBtn")
       .addEventListener("click", () => {
@@ -55,6 +59,22 @@ class ImportMapOverrider {
       this.filterImportMaps("");
       clearSearchBtn.style.display = "none";
       searchInput.focus();
+    });
+
+    // Override search functionality
+    const overrideSearchInput = document.getElementById("overrideSearchInput");
+    const clearOverrideSearchBtn = document.getElementById("clearOverrideSearchBtn");
+
+    overrideSearchInput.addEventListener("input", (e) => {
+      this.filterOverrides(e.target.value);
+      clearOverrideSearchBtn.style.display = e.target.value ? "flex" : "none";
+    });
+
+    clearOverrideSearchBtn.addEventListener("click", () => {
+      overrideSearchInput.value = "";
+      this.filterOverrides("");
+      clearOverrideSearchBtn.style.display = "none";
+      overrideSearchInput.focus();
     });
 
     // Event delegation for dynamically created buttons
@@ -315,6 +335,68 @@ class ImportMapOverrider {
     }
   }
 
+  filterOverrides(searchTerm) {
+    const container = document.getElementById("overridesList");
+    const overrideItems = container.querySelectorAll(".override-item");
+    
+    if (!searchTerm.trim()) {
+      // Show all items when search is empty
+      overrideItems.forEach(item => {
+        item.style.display = "flex";
+      });
+      this.removeOverrideNoResultsMessage();
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    let visibleCount = 0;
+
+    overrideItems.forEach(item => {
+      const nameElement = item.querySelector(".import-name");
+      const urlElements = item.querySelectorAll(".import-url");
+      
+      const name = nameElement ? nameElement.textContent.toLowerCase() : "";
+      const urls = Array.from(urlElements).map(el => el.textContent.toLowerCase()).join(" ");
+      
+      const matches = name.includes(searchLower) || urls.includes(searchLower);
+      
+      if (matches) {
+        item.style.display = "flex";
+        visibleCount++;
+      } else {
+        item.style.display = "none";
+      }
+    });
+
+    if (visibleCount === 0) {
+      this.showOverrideNoResultsMessage(searchTerm);
+    } else {
+      this.removeOverrideNoResultsMessage();
+    }
+  }
+
+  showOverrideNoResultsMessage(searchTerm) {
+    this.removeOverrideNoResultsMessage();
+    const container = document.getElementById("overridesList");
+    const noResultsDiv = document.createElement("div");
+    noResultsDiv.className = "no-results";
+    noResultsDiv.id = "overrideNoResultsMessage";
+    noResultsDiv.innerHTML = `
+      <div>No override rules found for "${this.escapeHtml(searchTerm)}"</div>
+      <div style="font-size: 12px; margin-top: 4px; color: #999;">
+        Try searching for other rule names or URLs
+      </div>
+    `;
+    container.appendChild(noResultsDiv);
+  }
+
+  removeOverrideNoResultsMessage() {
+    const existing = document.getElementById("overrideNoResultsMessage");
+    if (existing) {
+      existing.remove();
+    }
+  }
+
   quickOverride(name, url) {
     document.getElementById("packageName").value = name;
     document.getElementById("oldUrl").value = url;
@@ -375,6 +457,15 @@ class ImportMapOverrider {
   renderOverrides() {
     const container = document.getElementById("overridesList");
     const overrideEntries = Object.entries(this.overrides);
+    
+    // Clear any active search when re-rendering
+    const overrideSearchInput = document.getElementById("overrideSearchInput");
+    const clearOverrideSearchBtn = document.getElementById("clearOverrideSearchBtn");
+    if (overrideSearchInput) {
+      overrideSearchInput.value = "";
+      clearOverrideSearchBtn.style.display = "none";
+    }
+    this.removeOverrideNoResultsMessage();
 
     if (overrideEntries.length === 0) {
       container.innerHTML = `
@@ -395,11 +486,9 @@ class ImportMapOverrider {
                   <div>
                     <div class="import-name">${this.escapeHtml(name)}</div>
                     <div class="import-url" style="font-size: 10px; color: #888;">From: ${this.escapeHtml(
-          override.oldUrl
-        )}</div>
-        <div class="import-url">To: ${this.escapeHtml(
-          override.newUrl
-        )}</div>
+                      override.oldUrl
+                    )}</div>
+        <div class="import-url">To: ${this.escapeHtml(override.newUrl)}</div>
                   </div>
                   <button class="remove-btn" data-package-name="${this.escapeHtml(
                     name
@@ -423,7 +512,10 @@ class ImportMapOverrider {
       });
 
       if (response && response.success) {
-        console.log("Import Map Overrider: Updated network interception rules", this.overrides);
+        console.log(
+          "Import Map Overrider: Updated network interception rules",
+          this.overrides
+        );
 
         // Notify current page that override rules have been updated (optional, for status display)
         try {
@@ -449,14 +541,17 @@ class ImportMapOverrider {
             args: [this.overrides],
           });
         } catch (scriptError) {
-         // Ignore script injection errors, does not affect main functionality
-            console.warn(
-              "Import Map Overrider: Unable to notify page of update status",
-              error
-            );
+          // Ignore script injection errors, does not affect main functionality
+          console.warn(
+            "Import Map Overrider: Unable to notify page of update status",
+            error
+          );
         }
       } else {
-        console.error("Import Map Overrider: Failed to update network interception rules", response);
+        console.error(
+          "Import Map Overrider: Failed to update network interception rules",
+          response
+        );
       }
     } catch (error) {
       console.error("Failed to apply override rules:", error);
@@ -615,6 +710,7 @@ class ImportMapOverrider {
   displayCompareResults(diff) {
     const compareSection = document.getElementById("compareSection");
     const compareResults = document.getElementById("compareResults");
+    const applyChangesBtn = document.getElementById("applyChanges");
 
     // console.log('Displaying results for diff:', diff);
 
@@ -625,6 +721,16 @@ class ImportMapOverrider {
     const changedCount = Object.keys(diff.changed).length;
 
     // console.log('Counts:', { addedCount, removedCount, changedCount });
+
+    // Store the current diff for later use in applyChangesFromComparison
+    this.currentComparisonDiff = diff;
+
+    // Show/hide Apply Changes button based on whether there are changed packages
+    if (changedCount > 0) {
+      applyChangesBtn.style.display = "inline-block";
+    } else {
+      applyChangesBtn.style.display = "none";
+    }
 
     if (addedCount === 0 && removedCount === 0 && changedCount === 0) {
       html =
@@ -683,6 +789,85 @@ class ImportMapOverrider {
 
   closeCompareResults() {
     document.getElementById("compareSection").style.display = "none";
+    document.getElementById("applyChanges").style.display = "none";
+  }
+
+  async applyChangesFromComparison() {
+    if (!this.currentComparisonDiff || !this.currentComparisonDiff.changed) {
+      this.showError("No comparison data available");
+      return;
+    }
+
+    const changedPackages = this.currentComparisonDiff.changed;
+    const changedCount = Object.keys(changedPackages).length;
+
+    if (changedCount === 0) {
+      this.showError("No changed packages to apply");
+      return;
+    }
+
+    // Confirm with user before applying changes
+    const confirmed = confirm(
+      `This will create ${changedCount} override rule(s) to map current URLs to selected versions. Continue?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      // Load existing overrides
+      await this.loadOverrides();
+
+      let addedCount = 0;
+      let skippedCount = 0;
+
+      // Create override rules for each changed package
+      for (const [packageName, change] of Object.entries(changedPackages)) {
+        const oldUrl = change.new; // Current URL (what we want to override)
+        const newUrl = change.old; // Selected URL (what we want to redirect to)
+
+        // Check if an override with the same old URL already exists
+        const existingOverride = Object.values(this.overrides).find(
+          (override) => override.oldUrl === oldUrl
+        );
+
+        if (existingOverride) {
+          skippedCount++;
+          continue;
+        }
+
+        // Create new override rule with unique name
+        const ruleName = `${packageName}-comparison-override`;
+        const newOverride = {
+          oldUrl: oldUrl,
+          newUrl: newUrl,
+        };
+
+        this.overrides[ruleName] = newOverride;
+        addedCount++;
+      }
+
+      // Save the updated overrides
+      await this.saveOverrides();
+      await this.applyOverrides();
+      this.renderOverrides();
+
+      // Show success message
+      let message = `Successfully applied ${addedCount} override rule(s)`;
+      if (skippedCount > 0) {
+        message += ` (${skippedCount} skipped due to existing rules)`;
+      }
+      message += ". Please refresh the page for changes to take effect.";
+
+      this.showSuccess(message);
+
+      // Hide the Apply Changes button after successful application
+      document.getElementById("applyChanges").style.display = "none";
+    } catch (error) {
+      console.error("Failed to apply changes from comparison:", error);
+      this.showError("Failed to apply changes: " + error.message);
+    }
   }
 
   showSuccess(message) {
