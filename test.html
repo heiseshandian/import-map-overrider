@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Import Map Overrider 测试页面</title>
+    <title>Import Map Overrider Test Page</title>
 
-    <!-- 测试用的 Import Maps -->
+    <!-- Test Import Maps -->
     <script type="importmap">
       {
         "imports": {
@@ -24,7 +24,7 @@
       }
     </script>
 
-    <!-- 第二个 Import Map 用于测试多个 Import Maps -->
+    <!-- Second Import Map for testing multiple Import Maps -->
     <script type="importmap">
       {
         "imports": {
@@ -143,23 +143,23 @@
   </head>
   <body>
     <div class="header">
-      <h1>🚀 Import Map Overrider 测试页面</h1>
-      <p>这个页面包含了多个 Import Maps，用于测试扩展的功能</p>
+      <h1>🚀 Import Map Overrider Test Page</h1>
+      <p>This page contains multiple Import Maps for testing the extension's functionality</p>
     </div>
 
     <div class="section">
-      <h3>📋 使用说明</h3>
+      <h3>📋 Usage Instructions</h3>
       <div class="info">
-        <p><strong>如何测试扩展（Service Worker 模式）：</strong></p>
+        <p><strong>How to test the extension (Service Worker mode):</strong></p>
         <ol>
-          <li>确保已安装 Import Map Overrider 扩展</li>
-          <li>点击浏览器工具栏中的扩展图标</li>
-          <li>查看检测到的 Import Maps</li>
+          <li>Ensure the Import Map Overrider extension is installed</li>
+          <li>Click the extension icon in the browser toolbar</li>
+          <li>View the detected Import Maps</li>
           <li>
-            添加覆盖规则（例如：react → https://cdn.skypack.dev/react@17.0.2）
+            Add override rules (e.g.: react → https://cdn.skypack.dev/react@17.0.2)
           </li>
-          <li><strong>刷新页面</strong>使 Service Worker 拦截规则生效</li>
-          <li>使用下面的测试按钮验证覆盖是否生效</li>
+          <li><strong>Refresh the page</strong> to make Service Worker interception rules take effect</li>
+          <li>Use the test buttons below to verify if the override is working</li>
         </ol>
         <div
           style="
@@ -170,15 +170,15 @@
             margin-top: 12px;
           "
         >
-          <strong>⚠️ 重要提示：</strong>扩展现在使用 Service Worker
-          拦截网络请求来实现覆盖功能。添加或修改覆盖规则后，必须<strong>刷新页面</strong>才能看到效果。
+          <strong>⚠️ Important Note:</strong> The extension now uses Service Worker
+          to intercept network requests for override functionality. After adding or modifying override rules, you must <strong>refresh the page</strong> to see the effects.
         </div>
       </div>
     </div>
 
     <div class="section">
-      <h3>🔍 当前页面的 Import Maps</h3>
-      <p>这个页面包含以下 Import Maps：</p>
+      <h3>🔍 Current Page's Import Maps</h3>
+      <p>This page contains the following Import Maps:</p>
 
       <h4>Import Map #1</h4>
       <div class="code-block">
@@ -199,165 +199,165 @@
     </div>
 
     <div class="section">
-      <h3>🧪 测试功能</h3>
-      <p>使用下面的按钮测试模块导入和覆盖功能：</p>
+      <h3>🧪 Test Functions</h3>
+      <p>Use the buttons below to test module import and override functionality:</p>
 
       <button class="button" onclick="testImport('react')">
-        测试 React 导入
+        Test React Import
       </button>
       <button class="button" onclick="testImport('lodash')">
-        测试 Lodash 导入
+        Test Lodash Import
       </button>
-      <button class="button" onclick="testImport('vue')">测试 Vue 导入</button>
+      <button class="button" onclick="testImport('vue')">Test Vue Import</button>
       <button class="button" onclick="testImport('dayjs')">
-        测试 DayJS 导入
+        Test DayJS Import
       </button>
       <button class="button" onclick="testDirectUrlRedirect()">
-        测试精确 URL 重定向
+        Test Precise URL Redirect
       </button>
       <button class="button" onclick="showCurrentImportMaps()">
-        显示当前 Import Maps
+        Show Current Import Maps
       </button>
-      <button class="button" onclick="clearOutput()">清空输出</button>
+      <button class="button" onclick="clearOutput()">Clear Output</button>
 
-      <h4>输出结果：</h4>
-      <div id="output">点击上面的按钮开始测试...</div>
+      <h4>Output Results:</h4>
+      <div id="output">Click the buttons above to start testing...</div>
     </div>
 
     <div class="section">
-      <h3>💡 测试建议</h3>
+      <h3>💡 Test Recommendations</h3>
       <div class="info">
-        <p><strong>推荐的测试流程：</strong></p>
+        <p><strong>Recommended test workflow:</strong></p>
         <ol>
           <li>
-            <strong>查看原始状态</strong>：点击"显示当前 Import
-            Maps"查看初始状态
+            <strong>View original state</strong>: Click "Show Current Import
+            Maps" to view the initial state
           </li>
           <li>
-            <strong>测试导入</strong>：点击"测试 React
-            导入"等按钮，观察导入的模块信息
+            <strong>Test imports</strong>: Click "Test React
+            Import" and other buttons to observe imported module information
           </li>
           <li>
-            <strong>添加精确重定向</strong>：使用扩展添加 URL 重定向规则，例如：
+            <strong>Add precise redirection</strong>: Use the extension to add URL redirection rules, for example:
             <ul>
-              <li>规则名称：<code>react-redirect</code></li>
-              <li>旧 URL：<code>https://esm.sh/react@18.2.0</code></li>
-              <li>新 URL：<code>https://cdn.skypack.dev/react@17.0.2</code></li>
+              <li>Rule Name: <code>react-redirect</code></li>
+              <li>Old URL: <code>https://esm.sh/react@18.2.0</code></li>
+              <li>New URL: <code>https://cdn.skypack.dev/react@17.0.2</code></li>
             </ul>
           </li>
           <li>
-            <strong>刷新页面</strong>：添加覆盖规则后，刷新页面使 Service Worker
-            拦截生效
+            <strong>Refresh the page</strong>: After adding override rules, refresh the page to make Service Worker
+            interception take effect
           </li>
           <li>
-            <strong>验证覆盖</strong>：再次点击测试按钮，检查是否使用了新的 URL
+            <strong>Verify override</strong>: Click test buttons again to check if the new URL is being used
           </li>
           <li>
-            <strong>查看变化</strong>：点击"显示当前 Import
-            Maps"查看原始状态（Service Worker 在网络层拦截，不会修改页面的
-            Import Maps）
+            <strong>View changes</strong>: Click "Show Current Import
+            Maps" to view the original state (Service Worker intercepts at the network layer and doesn't modify the page's
+            Import Maps)
           </li>
         </ol>
         <p>
-          <strong>💡 工作原理：</strong>扩展使用 Service Worker
-          拦截网络请求并进行精确的 URL 重定向，实现模块的替换。
+          <strong>💡 How it works:</strong> The extension uses Service Worker
+          to intercept network requests and perform precise URL redirection to achieve module replacement.
         </p>
       </div>
     </div>
 
     <div class="section">
-      <h3>🐛 常见问题测试案例</h3>
+      <h3>🐛 Common Issue Test Cases</h3>
       <div class="error">
-        <h4>Vue 版本升级依赖错误</h4>
+        <h4>Vue Version Upgrade Dependency Error</h4>
         <p>
-          <strong>问题描述：</strong>将 Vue 从 3.5.13 升级到 3.5.16 后出现错误：
+          <strong>Problem Description:</strong> Error occurs after upgrading Vue from 3.5.13 to 3.5.16:
         </p>
         <div class="code-block">
           Uncaught SyntaxError: The requested module '/npm/vue-demi@0.14.6/+esm'
           does not provide an export named 'set'
         </div>
 
-        <p><strong>解决方案：</strong></p>
+        <p><strong>Solution:</strong></p>
         <ol>
           <li>
-            在扩展中添加 Vue 覆盖规则：<br />
-            <strong>包名：</strong><code>vue</code><br />
-            <strong>新 URL：</strong
+            Add Vue override rule in the extension:<br />
+            <strong>Package Name:</strong><code>vue</code><br />
+            <strong>New URL:</strong
             ><code
               >https://cdn.jsdelivr.net/npm/vue@3.5.16/dist/vue.esm-browser.prod.min.js</code
             >
           </li>
           <li>
-            扩展会自动将 <code>vue-demi</code> 映射到兼容版本
+            The extension will automatically map <code>vue-demi</code> to compatible version
             <code>vue-demi@0.14.10</code>
           </li>
-          <li>刷新页面验证修复效果</li>
+          <li>Refresh the page to verify the fix</li>
         </ol>
 
         <p>
-          <strong>💡 原理：</strong>不同版本的 Vue 需要不同版本的 vue-demi
-          依赖包，扩展的智能依赖映射功能会自动处理这种兼容性问题。
+          <strong>💡 Principle:</strong> Different versions of Vue require different versions of vue-demi
+          dependency packages. The extension's intelligent dependency mapping feature automatically handles such compatibility issues.
         </p>
       </div>
       
       <div class="error">
-        <h4>Vue Router 导出错误</h4>
-        <p><strong>问题描述：</strong>使用 Vue 3.x 时出现 vue-router 导出错误：</p>
+        <h4>Vue Router Export Error</h4>
+        <p><strong>Problem Description:</strong> Vue-router export error occurs when using Vue 3.x:</p>
         <div class="code-block">Uncaught SyntaxError: The requested module 'vue-router' does not provide an export named 'useRouter'</div>
         
-        <p><strong>解决方案：</strong></p>
+        <p><strong>Solution:</strong></p>
         <ol>
-          <li><strong>自动解决：</strong>当您添加 Vue 覆盖规则时，扩展会自动映射兼容的 vue-router 版本</li>
-          <li><strong>手动添加：</strong>如果需要特定版本，可手动添加：<br>
-              <strong>包名：</strong><code>vue-router</code><br>
-              <strong>新 URL：</strong><code>https://cdn.jsdelivr.net/npm/vue-router@4.4.5/dist/vue-router.esm-browser.js</code>
+          <li><strong>Automatic resolution:</strong> When you add Vue override rules, the extension will automatically map compatible vue-router versions</li>
+          <li><strong>Manual addition:</strong> If you need a specific version, you can manually add:<br>
+              <strong>Package Name:</strong><code>vue-router</code><br>
+              <strong>New URL:</strong><code>https://cdn.jsdelivr.net/npm/vue-router@4.4.5/dist/vue-router.esm-browser.js</code>
           </li>
-          <li>刷新页面验证修复效果</li>
+          <li>Refresh the page to verify the fix</li>
         </ol>
         
-        <p><strong>💡 原理：</strong>Vue 3.x 需要使用 vue-router 4.x 版本，且必须使用 ESM 浏览器构建版本才能正确导出 <code>useRouter</code> 等组合式 API。</p>
+        <p><strong>💡 Principle:</strong> Vue 3.x requires vue-router 4.x version, and must use the ESM browser build version to correctly export <code>useRouter</code> and other composition APIs.</p>
       </div>
     </div>
 
     <div class="section">
-      <h3>🔧 动态测试</h3>
-      <p>测试动态添加的 Import Maps：</p>
+      <h3>🔧 Dynamic Testing</h3>
+      <p>Test dynamically added Import Maps:</p>
       <button class="button" onclick="addDynamicImportMap()">
-        动态添加 Import Map
+        Add Dynamic Import Map
       </button>
       <button class="button" onclick="removeDynamicImportMap()">
-        移除动态 Import Map
+        Remove Dynamic Import Map
       </button>
     </div>
 
     <script type="module">
-      // 全局函数，用于测试
+      // Global functions for testing
       window.testImport = async function (moduleName) {
         const output = document.getElementById("output");
-        output.textContent += `\n正在测试导入: ${moduleName}...\n`;
+        output.textContent += `\nTesting import: ${moduleName}...\n`;
 
         try {
-          // 尝试导入模块
+          // Try to import module
           const module = await import(moduleName);
-          output.textContent += `✅ 成功导入 ${moduleName}\n`;
-          output.textContent += `📦 模块信息: ${JSON.stringify(
+          output.textContent += `✅ Successfully imported ${moduleName}\n`;
+          output.textContent += `📦 Module info: ${JSON.stringify(
             {
               name: moduleName,
               hasDefault: "default" in module,
-              exports: Object.keys(module).slice(0, 5), // 只显示前5个导出
+              exports: Object.keys(module).slice(0, 5), // Only show first 5 exports
               type: typeof module.default || typeof module,
             },
             null,
             2
           )}\n`;
 
-          // 如果可能，显示模块的版本信息
+          // If possible, show module version info
           if (module.version) {
-            output.textContent += `🏷️  版本: ${module.version}\n`;
+            output.textContent += `🏷️  Version: ${module.version}\n`;
           }
         } catch (error) {
-          output.textContent += `❌ 导入失败: ${error.message}\n`;
-          output.textContent += `🔍 错误详情: ${error.stack}\n`;
+          output.textContent += `❌ Import failed: ${error.message}\n`;
+          output.textContent += `🔍 Error details: ${error.stack}\n`;
         }
 
         output.textContent += "\n" + "=".repeat(50) + "\n";
@@ -366,7 +366,7 @@
 
       window.showCurrentImportMaps = function () {
         const output = document.getElementById("output");
-        output.textContent += "\n📋 当前页面的所有 Import Maps:\n";
+        output.textContent += "\n📋 All Import Maps on current page:\n";
 
         const scripts = document.querySelectorAll('script[type="importmap"]');
         scripts.forEach((script, index) => {
@@ -377,31 +377,31 @@
             }:\n`;
             output.textContent += JSON.stringify(content, null, 2) + "\n";
           } catch (error) {
-            output.textContent += `\n❌ Import Map #${index + 1} 解析失败: ${
+            output.textContent += `\n❌ Import Map #${index + 1} parsing failed: ${
               error.message
             }\n`;
           }
         });
 
-        // 如果扩展注入了全局对象，也显示相关信息
+        // If extension injected global object, also show related info
         if (window.importMapOverrider) {
-          output.textContent += "\n🔧 扩展信息:\n";
+          output.textContent += "\n🔧 Extension info:\n";
           try {
             const overrides = window.importMapOverrider.getOverrides();
-            output.textContent += `当前覆盖规则: ${JSON.stringify(
+            output.textContent += `Current override rules: ${JSON.stringify(
               overrides,
               null,
               2
             )}\n`;
 
             const merged = window.importMapOverrider.getMergedImportMap();
-            output.textContent += `合并后的 Import Map: ${JSON.stringify(
+            output.textContent += `Merged Import Map: ${JSON.stringify(
               merged,
               null,
               2
             )}\n`;
           } catch (error) {
-            output.textContent += `获取扩展信息失败: ${error.message}\n`;
+            output.textContent += `Failed to get extension info: ${error.message}\n`;
           }
         }
 
@@ -410,56 +410,56 @@
       };
 
       window.clearOutput = function () {
-        document.getElementById("output").textContent = "输出已清空...\n";
+        document.getElementById("output").textContent = "Output cleared...\n";
       };
 
       window.testDirectUrlRedirect = async function () {
         const output = document.getElementById("output");
-        output.textContent += "\n🎯 测试精确 URL 重定向功能...\n";
-        output.textContent += "📋 这个测试会尝试加载一个特定的 URL\n";
-        output.textContent += "💡 如果配置了精确重定向规则，应该会重定向到新的 URL\n\n";
+        output.textContent += "\n🎯 Testing precise URL redirect functionality...\n";
+        output.textContent += "📋 This test will try to load a specific URL\n";
+        output.textContent += "💡 If precise redirect rules are configured, it should redirect to the new URL\n\n";
         
         try {
-          // 测试加载一个特定的 URL
+          // Test loading a specific URL
           const testUrl = 'https://esm.sh/lodash@4.17.21';
-          output.textContent += `🔗 尝试加载: ${testUrl}\n`;
+          output.textContent += `🔗 Attempting to load: ${testUrl}\n`;
           
-          // 创建一个动态导入来测试重定向
+          // Create a dynamic import to test redirection
           const startTime = Date.now();
           const module = await import(testUrl);
           const loadTime = Date.now() - startTime;
           
-          output.textContent += `✅ 加载成功！耗时: ${loadTime}ms\n`;
-          output.textContent += `📦 模块信息: ${typeof module}\n`;
+          output.textContent += `✅ Load successful! Time taken: ${loadTime}ms\n`;
+          output.textContent += `📦 Module info: ${typeof module}\n`;
           
           if (module.default) {
-            output.textContent += `🔧 默认导出: ${typeof module.default}\n`;
+            output.textContent += `🔧 Default export: ${typeof module.default}\n`;
             if (typeof module.default === 'function') {
-              output.textContent += `📝 函数名: ${module.default.name || '匿名函数'}\n`;
+              output.textContent += `📝 Function name: ${module.default.name || 'Anonymous function'}\n`;
             }
           }
           
-          // 检查是否有常见的 lodash 方法
+          // Check for common lodash methods
           const commonMethods = ['map', 'filter', 'reduce', 'forEach'];
           const availableMethods = commonMethods.filter(method => 
             module.default && typeof module.default[method] === 'function'
           );
           
           if (availableMethods.length > 0) {
-            output.textContent += `🛠️  可用方法: ${availableMethods.join(', ')}\n`;
+            output.textContent += `🛠️  Available methods: ${availableMethods.join(', ')}\n`;
           }
           
-          output.textContent += "\n💡 提示: 如果配置了精确重定向规则，实际加载的可能是重定向后的 URL\n";
-          output.textContent += "🔍 检查网络面板可以看到实际的请求和重定向\n";
+          output.textContent += "\n💡 Tip: If precise redirect rules are configured, the actual loaded URL might be the redirected one\n";
+          output.textContent += "🔍 Check the network panel to see actual requests and redirects\n";
           
         } catch (error) {
-          output.textContent += `❌ 加载失败: ${error.message}\n`;
-          output.textContent += `🔍 错误类型: ${error.name}\n`;
+          output.textContent += `❌ Load failed: ${error.message}\n`;
+          output.textContent += `🔍 Error type: ${error.name}\n`;
           
           if (error.message.includes('CORS')) {
-            output.textContent += "🚨 CORS 错误: 这可能是由于跨域限制导致的\n";
+            output.textContent += "🚨 CORS error: This might be due to cross-origin restrictions\n";
           } else if (error.message.includes('network')) {
-            output.textContent += "🌐 网络错误: 请检查网络连接\n";
+            output.textContent += "🌐 Network error: Please check network connection\n";
           }
         }
         
@@ -471,7 +471,7 @@
 
       window.addDynamicImportMap = function () {
         if (dynamicImportMapAdded) {
-          alert("动态 Import Map 已存在");
+          alert("Dynamic Import Map already exists");
           return;
         }
 
@@ -493,9 +493,9 @@
         dynamicImportMapAdded = true;
 
         const output = document.getElementById("output");
-        output.textContent += "\n✅ 动态添加了新的 Import Map\n";
-        output.textContent += "📦 新增模块: dynamic-test, test-module\n";
-        output.textContent += "💡 现在可以使用扩展查看新添加的 Import Map\n\n";
+        output.textContent += "\n✅ Dynamically added new Import Map\n";
+        output.textContent += "📦 New modules: dynamic-test, test-module\n";
+        output.textContent += "💡 You can now use the extension to view the newly added Import Map\n\n";
         output.scrollTop = output.scrollHeight;
       };
 
@@ -506,29 +506,29 @@
           dynamicImportMapAdded = false;
 
           const output = document.getElementById("output");
-          output.textContent += "\n🗑️  移除了动态 Import Map\n\n";
+          output.textContent += "\n🗑️  Removed dynamic Import Map\n\n";
           output.scrollTop = output.scrollHeight;
         } else {
-          alert("没有找到动态 Import Map");
+          alert("Dynamic Import Map not found");
         }
       };
 
-      // 页面加载完成后的初始化
+      // Initialization after page load
       document.addEventListener("DOMContentLoaded", function () {
         const output = document.getElementById("output");
-        output.textContent = "🎉 测试页面已加载完成！\n";
+        output.textContent = "🎉 Test page loaded successfully!\n";
         output.textContent +=
-          "📋 检测到 " +
+          "📋 Detected " +
           document.querySelectorAll('script[type="importmap"]').length +
-          " 个 Import Maps\n";
-        output.textContent += "🚀 请打开扩展开始测试...\n\n";
+          " Import Maps\n";
+        output.textContent += "🚀 Please open the extension to start testing...\n\n";
       });
 
-      // 监听扩展的事件
+      // Listen for extension events
       window.addEventListener("importMapOverrideApplied", function (event) {
         const output = document.getElementById("output");
-        output.textContent += "\n🔄 检测到 Import Map 覆盖已应用\n";
-        output.textContent += `📝 覆盖规则: ${JSON.stringify(
+        output.textContent += "\n🔄 Detected Import Map override applied\n";
+        output.textContent += `📝 Override rules: ${JSON.stringify(
           event.detail.overrides,
           null,
           2

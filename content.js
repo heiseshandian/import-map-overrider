@@ -1,5 +1,5 @@
 // Content Script for Import Map Overrider
-// 这个脚本运行在页面上下文中，用于检测和操作 import maps
+// This script runs in page context to detect and manipulate import maps
 
 class ImportMapContentScript {
   constructor() {
@@ -8,34 +8,34 @@ class ImportMapContentScript {
   }
 
   async init() {
-    // 监听 DOM 变化，以便检测新的 import maps
+    // Listen for DOM changes to detect new import maps
     this.observeImportMaps();
 
-    // 监听来自 popup 的消息
+    // Listen for messages from popup
     this.setupMessageListener();
 
-    console.log('Import Map Overrider: Content Script 已初始化（Service Worker 模式）');
+    console.log('Import Map Overrider: Content Script initialized (Service Worker mode)');
   }
 
-  // Service Worker 模式下不再需要注入脚本和应用覆盖规则
-  // 覆盖功能现在通过 Service Worker 的网络拦截实现
+  // No longer need to inject scripts and apply override rules in Service Worker mode
+  // Override functionality is now implemented through Service Worker network interception
 
   observeImportMaps() {
-    // 创建 MutationObserver 来监听 DOM 变化，用于检测新的 import maps
+    // Create MutationObserver to listen for DOM changes to detect new import maps
     this.observer = new MutationObserver((mutations) => {
       let hasNewImportMap = false;
 
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
-            // 检查是否是新的 importmap
+            // Check if it's a new importmap
             if (
               node.tagName === "SCRIPT" &&
               node.type === "importmap"
             ) {
               hasNewImportMap = true;
             }
-            // 检查子元素中是否有 importmap
+            // Check if there are importmaps in child elements
             const importMaps =
               node.querySelectorAll &&
               node.querySelectorAll('script[type="importmap"]');
@@ -46,13 +46,13 @@ class ImportMapContentScript {
         });
       });
 
-      // 如果检测到新的 importmap，记录日志（Service Worker 会自动处理拦截）
+      // If new importmap is detected, log it (Service Worker will automatically handle interception)
       if (hasNewImportMap) {
-        console.log('Import Map Overrider: 检测到新的 import map');
+        console.log('Import Map Overrider: Detected new import map');
       }
     });
 
-    // 开始观察
+    // Start observing
     this.observer.observe(document.head, {
       childList: true,
       subtree: true,
@@ -60,7 +60,7 @@ class ImportMapContentScript {
   }
 
   setupMessageListener() {
-    // 监听来自 popup 的消息
+    // Listen for messages from popup
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       switch (message.type) {
         case "GET_IMPORT_MAPS":
@@ -75,7 +75,7 @@ class ImportMapContentScript {
   extractImportMaps() {
     const importMaps = [];
 
-    // 查找所有 importmap script 标签
+    // Find all importmap script tags
     const scripts = document.querySelectorAll('script[type="importmap"]');
 
     scripts.forEach((script, index) => {
@@ -83,7 +83,7 @@ class ImportMapContentScript {
         const content = script.textContent || script.innerHTML;
         const parsed = JSON.parse(content);
 
-        // 在 Service Worker 模式下，不再有注入的覆盖脚本
+        // In Service Worker mode, there are no more injected override scripts
         const isOverrideScript = false;
 
         importMaps.push({
@@ -96,7 +96,7 @@ class ImportMapContentScript {
           scopes: parsed.scopes || {},
         });
       } catch (error) {
-        console.error("Import Map Overrider: 解析 importmap 失败", error);
+        console.error("Import Map Overrider: Failed to parse importmap", error);
         importMaps.push({
           index: index + 1,
           id: script.id || null,
@@ -120,7 +120,7 @@ class ImportMapContentScript {
   }
 }
 
-// 初始化内容脚本
+// Initialize content script
 let importMapContentScript;
 
 function initContentScript() {
@@ -135,7 +135,7 @@ if (document.readyState === "loading") {
   initContentScript();
 }
 
-// 页面卸载时清理
+// Cleanup when page unloads
 window.addEventListener("beforeunload", () => {
   if (importMapContentScript) {
     importMapContentScript.destroy();

@@ -41,7 +41,7 @@ class ImportMapOverrider {
       this.closeCompareResults();
     });
 
-    // 搜索功能
+    // Search functionality
     const searchInput = document.getElementById("searchInput");
     const clearSearchBtn = document.getElementById("clearSearchBtn");
 
@@ -135,8 +135,8 @@ class ImportMapOverrider {
       this.importMaps = results[0].result || [];
       this.renderImportMaps();
     } catch (error) {
-      console.error("获取 import maps 失败:", error);
-      this.showError("无法获取页面的 import maps");
+      console.error("Failed to get import maps:", error);
+      this.showError("Unable to get page import maps");
     }
   }
 
@@ -146,9 +146,9 @@ class ImportMapOverrider {
     if (this.importMaps.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div>未找到 Import Maps</div>
+          <div>No Import Maps found</div>
           <div style="font-size: 12px; margin-top: 8px; color: #999;">
-            此页面可能没有使用 ES Module Import Maps
+            This page may not be using ES Module Import Maps
           </div>
         </div>
       `;
@@ -168,7 +168,7 @@ class ImportMapOverrider {
           <button class="override-btn" data-package-name="${this.escapeHtml(
             name
           )}" data-package-url="${this.escapeHtml(url)}">
-            覆盖
+            Override
           </button>
         </div>
       `
@@ -216,7 +216,7 @@ class ImportMapOverrider {
           <div class="import-map-header">
             <div class="import-map-type">Import Map #${index}</div>
             <button class="toggle-btn">
-              切换显示
+              Toggle Display
             </button>
           </div>
           <div class="import-list">
@@ -228,7 +228,7 @@ class ImportMapOverrider {
       })
       .join("");
 
-    // 应用当前的搜索过滤
+    // Apply current search filter
     const searchInput = document.getElementById("searchInput");
     if (searchInput && searchInput.value) {
       this.filterImportMaps(searchInput.value);
@@ -240,7 +240,7 @@ class ImportMapOverrider {
     const importMapItems = container.querySelectorAll(".import-map-item");
 
     if (!searchTerm.trim()) {
-      // 显示所有项目
+      // Show all items
       importMapItems.forEach((item) => {
         item.classList.remove("hidden");
         const importItems = item.querySelectorAll(".import-item");
@@ -277,7 +277,7 @@ class ImportMapOverrider {
         }
       });
 
-      // 如果这个import map有可见的导入项，则显示整个map
+      // If this import map has visible import items, show the entire map
       if (hasVisibleImports) {
         mapItem.classList.remove("hidden");
       } else {
@@ -285,7 +285,7 @@ class ImportMapOverrider {
       }
     });
 
-    // 显示或隐藏"无结果"消息
+    // Show or hide "no results" message
     if (!hasVisibleResults) {
       this.showNoResultsMessage(searchTerm);
     } else {
@@ -300,9 +300,9 @@ class ImportMapOverrider {
     noResultsDiv.className = "no-results";
     noResultsDiv.id = "noResultsMessage";
     noResultsDiv.innerHTML = `
-      <div>未找到匹配 "${this.escapeHtml(searchTerm)}" 的结果</div>
+      <div>No results found for "${this.escapeHtml(searchTerm)}"</div>
       <div style="font-size: 12px; margin-top: 4px; color: #999;">
-        尝试搜索其他包名或URL
+        Try searching for other package names or URLs
       </div>
     `;
     container.appendChild(noResultsDiv);
@@ -326,29 +326,29 @@ class ImportMapOverrider {
     const oldUrl = document.getElementById("oldUrl").value.trim();
     const newUrl = document.getElementById("newUrl").value.trim();
 
-    // 检查必填字段
+    // Check required fields
     if (!packageName) {
-      alert("请填写规则名称");
+      alert("Please enter rule name");
       return;
     }
 
     if (!oldUrl) {
-      alert("旧 URL 为必填项");
+      alert("Old URL is required");
       return;
     }
 
     if (!newUrl) {
-      alert("请填写新 URL");
+      alert("Please enter new URL");
       return;
     }
 
-    // 只支持新格式：URL 重定向
+    // Only support new format: URL redirection
     this.overrides[packageName] = { oldUrl, newUrl };
 
     await this.saveOverrides();
     await this.applyOverrides();
 
-    // 清空输入框
+    // Clear input fields
     document.getElementById("packageName").value = "";
     document.getElementById("oldUrl").value = "";
     document.getElementById("newUrl").value = "";
@@ -364,7 +364,7 @@ class ImportMapOverrider {
   }
 
   async clearAllOverrides() {
-    if (confirm("确定要清除所有覆盖规则吗？")) {
+    if (confirm("Are you sure you want to clear all override rules?")) {
       this.overrides = {};
       await this.saveOverrides();
       await this.applyOverrides();
@@ -379,7 +379,7 @@ class ImportMapOverrider {
     if (overrideEntries.length === 0) {
       container.innerHTML = `
         <div class="empty-state" style="padding: 20px;">
-          <div style="color: #666; font-size: 12px;">暂无覆盖规则</div>
+          <div style="color: #666; font-size: 12px;">No override rules</div>
         </div>
       `;
       return;
@@ -389,22 +389,22 @@ class ImportMapOverrider {
       <div class="overrides-list">
         ${overrideEntries
           .map(([name, override]) => {
-            // 只支持新格式：URL 重定向
+            // Only support new format: URL redirection
             return `
                 <div class="override-item">
                   <div>
                     <div class="import-name">${this.escapeHtml(name)}</div>
-                    <div class="import-url" style="font-size: 10px; color: #888;">从: ${this.escapeHtml(
-                      override.oldUrl
-                    )}</div>
-                    <div class="import-url">到: ${this.escapeHtml(
-                      override.newUrl
-                    )}</div>
+                    <div class="import-url" style="font-size: 10px; color: #888;">From: ${this.escapeHtml(
+          override.oldUrl
+        )}</div>
+        <div class="import-url">To: ${this.escapeHtml(
+          override.newUrl
+        )}</div>
                   </div>
                   <button class="remove-btn" data-package-name="${this.escapeHtml(
                     name
                   )}">
-                    删除
+                    Delete
                   </button>
                 </div>
               `;
@@ -416,16 +416,16 @@ class ImportMapOverrider {
 
   async applyOverrides() {
     try {
-      // 通过 Service Worker 更新网络拦截规则
+      // Update network interception rules through Service Worker
       const response = await chrome.runtime.sendMessage({
         type: "UPDATE_OVERRIDES",
         overrides: this.overrides,
       });
 
       if (response && response.success) {
-        console.log("Import Map Overrider: 已更新网络拦截规则", this.overrides);
+        console.log("Import Map Overrider: Updated network interception rules", this.overrides);
 
-        // 通知当前页面覆盖规则已更新（可选，用于显示状态）
+        // Notify current page that override rules have been updated (optional, for status display)
         try {
           const [tab] = await chrome.tabs.query({
             active: true,
@@ -435,7 +435,7 @@ class ImportMapOverrider {
           await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: (overrides) => {
-              // 触发自定义事件通知页面覆盖规则已更新
+              // Trigger custom event to notify page that override rules have been updated
               window.dispatchEvent(
                 new CustomEvent("importMapOverrideUpdated", {
                   detail: { overrides },
@@ -443,23 +443,23 @@ class ImportMapOverrider {
               );
 
               console.log(
-                "Import Map Overrider: 网络拦截规则已生效，刷新页面后将使用新的模块 URL"
+                "Import Map Overrider: Network interception rules are now active, new module URLs will be used after page refresh"
               );
             },
             args: [this.overrides],
           });
         } catch (scriptError) {
-          // 忽略脚本注入错误，不影响主要功能
-          console.warn(
-            "Import Map Overrider: 无法通知页面更新状态",
-            scriptError
-          );
+         // Ignore script injection errors, does not affect main functionality
+            console.warn(
+              "Import Map Overrider: Unable to notify page of update status",
+              error
+            );
         }
       } else {
-        console.error("Import Map Overrider: 更新网络拦截规则失败", response);
+        console.error("Import Map Overrider: Failed to update network interception rules", response);
       }
     } catch (error) {
-      console.error("应用覆盖规则失败:", error);
+      console.error("Failed to apply override rules:", error);
     }
   }
 
@@ -468,7 +468,7 @@ class ImportMapOverrider {
       const result = await chrome.storage.local.get(["importMapOverrides"]);
       this.overrides = result.importMapOverrides || {};
     } catch (error) {
-      console.error("加载覆盖规则失败:", error);
+      console.error("Failed to load override rules:", error);
       this.overrides = {};
     }
   }
@@ -477,7 +477,7 @@ class ImportMapOverrider {
     try {
       await chrome.storage.local.set({ importMapOverrides: this.overrides });
     } catch (error) {
-      console.error("保存覆盖规则失败:", error);
+      console.error("Failed to save override rules:", error);
     }
   }
 
@@ -498,7 +498,7 @@ class ImportMapOverrider {
 
   async selectForCompare() {
     try {
-      // 获取当前页面的importmap数据
+      // Get current page's importmap data
       const currentImportMaps = {};
       this.importMaps.forEach((importMap) => {
         if (importMap.content && importMap.content.imports) {
@@ -506,36 +506,36 @@ class ImportMapOverrider {
         }
       });
 
-      // Debug: 可以在开发时取消注释
+      // Debug: Can be uncommented during development
       // console.log('Selected Import Map:', currentImportMaps);
       // console.log('Import Maps count:', Object.keys(currentImportMaps).length);
 
-      // 存储到chrome.storage.local
+      // Store to chrome.storage.local
       await chrome.storage.local.set({ selectedImportMap: currentImportMaps });
 
-      // 显示成功消息
+      // Show success message
       this.showSuccess(
-        `当前页面的 Import Map 已选择用于比较 (${
+        `Current page's Import Map has been selected for comparison (${
           Object.keys(currentImportMaps).length
-        } 个包)`
+        } packages)`
       );
     } catch (error) {
-      this.showError("选择 Import Map 失败: " + error.message);
+      this.showError("Failed to select Import Map: " + error.message);
     }
   }
 
   async compareWithSelected() {
     try {
-      // 获取之前存储的importmap
+      // Get previously stored importmap
       const result = await chrome.storage.local.get(["selectedImportMap"]);
       const selectedImportMap = result.selectedImportMap;
 
       if (!selectedImportMap) {
-        this.showError("请先选择一个 Import Map 用于比较");
+        this.showError("Please select an Import Map for comparison first");
         return;
       }
 
-      // 获取当前页面的importmap
+      // Get current page's importmap
       const currentImportMaps = {};
       this.importMaps.forEach((importMap) => {
         if (importMap.content && importMap.content.imports) {
@@ -543,21 +543,21 @@ class ImportMapOverrider {
         }
       });
 
-      // Debug: 可以在开发时取消注释
+      // Debug: Can be uncommented during development
       // console.log('Selected Import Map:', selectedImportMap);
       // console.log('Current Import Map:', currentImportMaps);
       // console.log('Selected keys:', Object.keys(selectedImportMap));
       // console.log('Current keys:', Object.keys(currentImportMaps));
 
-      // 比较两个importmap
+      // Compare two importmaps
       const diff = this.compareImportMaps(selectedImportMap, currentImportMaps);
 
       // console.log('Diff result:', diff);
 
-      // 显示比较结果
+      // Display comparison results
       this.displayCompareResults(diff);
     } catch (error) {
-      this.showError("比较 Import Map 失败: " + error.message);
+      this.showError("Failed to compare Import Map: " + error.message);
     }
   }
 
@@ -568,7 +568,7 @@ class ImportMapOverrider {
       changed: {},
     };
 
-    // 确保输入参数是对象
+    // Ensure input parameters are objects
     if (!selected || typeof selected !== "object") {
       console.warn("Selected import map is not a valid object:", selected);
       selected = {};
@@ -578,7 +578,7 @@ class ImportMapOverrider {
       current = {};
     }
 
-    // Debug: 可以在开发时取消注释
+    // Debug: Can be uncommented during development
     // console.log('Comparing:', {
     //   selectedKeys: Object.keys(selected),
     //   currentKeys: Object.keys(current),
@@ -586,7 +586,7 @@ class ImportMapOverrider {
     //   currentCount: Object.keys(current).length
     // });
 
-    // 找出新增的包
+    // Find added packages
     for (const [name, url] of Object.entries(current)) {
       if (!selected.hasOwnProperty(name)) {
         diff.added[name] = url;
@@ -600,7 +600,7 @@ class ImportMapOverrider {
       }
     }
 
-    // 找出删除的包
+    // Find removed packages
     for (const [name, url] of Object.entries(selected)) {
       if (!current.hasOwnProperty(name)) {
         diff.removed[name] = url;
@@ -628,18 +628,18 @@ class ImportMapOverrider {
 
     if (addedCount === 0 && removedCount === 0 && changedCount === 0) {
       html =
-        "<div style='text-align: center; color: #28a745; padding: 20px;'>✅ 两个 Import Map 完全相同</div>";
+        "<div style='text-align: center; color: #28a745; padding: 20px;'>✅ The two Import Maps are identical</div>";
     } else {
-      // 添加总结信息
+      // Add summary information
       html += `<div style='background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 13px;'>`;
-      html += `📊 <strong>比较结果总结:</strong> `;
-      if (addedCount > 0) html += `新增 ${addedCount} 个包 `;
-      if (removedCount > 0) html += `删除 ${removedCount} 个包 `;
-      if (changedCount > 0) html += `变更 ${changedCount} 个包`;
+      html += `📊 <strong>Comparison Summary:</strong> `;
+      if (addedCount > 0) html += `Added ${addedCount} packages `;
+      if (removedCount > 0) html += `Removed ${removedCount} packages `;
+      if (changedCount > 0) html += `Changed ${changedCount} packages`;
       html += `</div>`;
       if (Object.keys(diff.added).length > 0) {
         html +=
-          "<h4 style='color: #155724; margin: 12px 0 8px 0;'>🆕 新增的包:</h4>";
+          "<h4 style='color: #155724; margin: 12px 0 8px 0;'>🆕 Added Packages:</h4>";
         for (const [name, url] of Object.entries(diff.added)) {
           html += `<div class='diff-item diff-added'>+ ${this.escapeHtml(
             name
@@ -649,7 +649,7 @@ class ImportMapOverrider {
 
       if (Object.keys(diff.removed).length > 0) {
         html +=
-          "<h4 style='color: #721c24; margin: 12px 0 8px 0;'>🗑️ 删除的包:</h4>";
+          "<h4 style='color: #721c24; margin: 12px 0 8px 0;'>🗑️ Removed Packages:</h4>";
         for (const [name, url] of Object.entries(diff.removed)) {
           html += `<div class='diff-item diff-removed'>- ${this.escapeHtml(
             name
@@ -659,7 +659,7 @@ class ImportMapOverrider {
 
       if (Object.keys(diff.changed).length > 0) {
         html +=
-          "<h4 style='color: #856404; margin: 12px 0 8px 0;'>🔄 版本变更的包:</h4>";
+          "<h4 style='color: #856404; margin: 12px 0 8px 0;'>🔄 Changed Packages:</h4>";
         for (const [name, change] of Object.entries(diff.changed)) {
           html += `<div class='diff-item diff-changed'>~ ${this.escapeHtml(
             name
@@ -677,7 +677,7 @@ class ImportMapOverrider {
     compareResults.innerHTML = html;
     compareSection.style.display = "block";
 
-    // 滚动到比较结果区域
+    // Scroll to comparison results area
     compareSection.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -697,12 +697,12 @@ class ImportMapOverrider {
   }
 }
 
-// 全局实例
+// Global instance
 let importMapOverrider;
 
-// 初始化
+// Initialize
 document.addEventListener("DOMContentLoaded", () => {
   importMapOverrider = new ImportMapOverrider();
-  // 将实例暴露到 window 对象，确保 onclick 事件可以访问
+  // Expose instance to window object to ensure onclick events can access it
   window.importMapOverrider = importMapOverrider;
 });

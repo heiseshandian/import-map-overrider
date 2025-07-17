@@ -345,18 +345,18 @@
 
     <div class="compare-section" id="compareSection">
       <button class="close-compare-btn" id="closeCompareBtn">×</button>
-      <div class="section-title">Import Map 比较结果</div>
+      <div class="section-title">Import Map Comparison Results</div>
       <div id="compareResults"></div>
     </div>
 
     <div class="section">
-      <div class="section-title">当前页面的 Import Maps</div>
+      <div class="section-title">Current Page's Import Maps</div>
       <div class="search-container">
         <input
           type="text"
           class="search-input"
           id="searchInput"
-          placeholder="搜索包名或URL..."
+          placeholder="Search package names or URLs..."
         />
         <button class="clear-search-btn" id="clearSearchBtn">×</button>
       </div>
@@ -364,7 +364,7 @@
     </div>
 
     <div class="section override-section">
-      <div class="section-title">添加覆盖规则</div>
+      <div class="section-title">Add Override Rules</div>
       <div
         style="
           background: #e3f2fd;
@@ -376,49 +376,49 @@
           color: #1565c0;
         "
       >
-        🎯 <strong>精确重定向：</strong>直接从旧 URL 307 重定向到新 URL <br />📋
-        <strong>必填字段：</strong>规则名称、旧 URL、新 URL 都为必填项 <br />⚠️
-        <strong>重要提醒：</strong
-        >添加覆盖规则后，请<strong>刷新页面</strong>使其生效。
+        🎯 <strong>Precise Redirection:</strong> Direct 307 redirect from old URL to new URL <br />📋
+          <strong>Required Fields:</strong> Rule name, old URL, and new URL are all required <br />⚠️
+          <strong>Important Reminder:</strong
+          > After adding override rules, please <strong>refresh the page</strong> for them to take effect.
       </div>
       <div class="override-form">
         <div class="form-group">
-          <label class="form-label">规则名称</label>
+          <label class="form-label">Rule Name</label>
           <input
             type="text"
             class="form-input"
             id="packageName"
-            placeholder="例如: react 或 my-redirect-rule"
+            placeholder="e.g.: react or my-redirect-rule"
           />
         </div>
         <div class="form-group">
-          <label class="form-label">旧 URL（必填）</label>
+          <label class="form-label">Old URL (Required)</label>
           <input
             type="text"
             class="form-input"
             id="oldUrl"
-            placeholder="例如: https://esm.sh/react@18.2.0"
+            placeholder="e.g.: https://esm.sh/react@18.2.0"
             required
           />
         </div>
         <div class="form-group">
-          <label class="form-label">新 URL</label>
+          <label class="form-label">New URL</label>
           <input
             type="text"
             class="form-input"
             id="newUrl"
-            placeholder="例如: https://esm.sh/react@18.2.0"
+            placeholder="e.g.: https://esm.sh/react@18.2.0"
           />
         </div>
         <div class="form-actions">
-          <button class="btn-primary" id="addOverride">添加覆盖</button>
-          <button class="btn-secondary" id="clearAll">清除所有</button>
+          <button class="btn-primary" id="addOverride">Add Override</button>
+        <button class="btn-secondary" id="clearAll">Clear All</button>
         </div>
       </div>
     </div>
 
     <div class="section">
-      <div class="section-title">当前覆盖规则</div>
+      <div class="section-title">Current Override Rules</div>
       <div id="overridesList"></div>
     </div>
 

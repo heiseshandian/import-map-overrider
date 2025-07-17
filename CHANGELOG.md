@@ -1,64 +1,64 @@
-# 更新日志
+# Changelog
 
-## v2.0.0 - 2024-12-19
+## v2.0.0
 
-### 💥 重大变更
+### 💥 Breaking Changes
 
-#### 移除向后兼容性
-- **不再支持包名映射模式**：移除了旧的字符串格式覆盖规则（`packageName -> newUrl`）
-- **强制精确重定向**：所有覆盖规则现在都必须使用 `{ oldUrl, newUrl }` 格式
-- **旧 URL 必填**：创建覆盖规则时，"旧 URL" 字段现在是必填项
+#### Removed Backward Compatibility
+- **No longer supports package name mapping mode**: Removed old string format override rules (`packageName -> newUrl`)
+- **Enforced precise redirection**: All override rules now must use `{ oldUrl, newUrl }` format
+- **Old URL required**: When creating override rules, the "Old URL" field is now mandatory
 
-### 🎯 新增功能
+### 🎯 New Features
 
-#### 精确 URL 重定向（唯一模式）
-- **精确匹配重定向**：支持直接从 `oldUrl` 重定向到 `newUrl`
-- **快速覆盖优化**：点击"快速覆盖"时自动填充 `oldUrl` 和 `newUrl` 字段
-- **简化配置**：直接指定完整的源 URL 和目标 URL
+#### Precise URL Redirection (Only Mode)
+- **Precise match redirection**: Support direct redirection from `oldUrl` to `newUrl`
+- **Quick override optimization**: Automatically fill `oldUrl` and `newUrl` fields when clicking "Quick Override"
+- **Simplified configuration**: Directly specify complete source URL and target URL
 
-#### 用户界面改进
-- **简化界面**：移除包名映射相关的说明和选项
-- **强制字段**："旧 URL" 现在是必填字段，界面明确标识
-- **更新占位符文本**：提供更清晰的输入指导
+#### User Interface Improvements
+- **Simplified interface**: Removed package name mapping related instructions and options
+- **Required fields**: "Old URL" is now a required field, clearly marked in the interface
+- **Updated placeholder text**: Provide clearer input guidance
 
-### 🔧 技术改进
+### 🔧 Technical Improvements
 
-#### Service Worker 优化
-- **简化规则生成**：只处理精确 URL 重定向
-- **移除复杂逻辑**：移除包名匹配逻辑
-- **提高性能**：减少不必要的模式匹配
+#### Service Worker Optimization
+- **Simplified rule generation**: Only handle precise URL redirection
+- **Removed complex logic**: Removed package name matching logic
+- **Improved performance**: Reduced unnecessary pattern matching
 
-#### 测试功能更新
-- **更新测试说明**：只保留精确重定向相关内容
-- **移除包名映射测试**：移除包名映射测试案例
-- **简化工作原理说明**：专注于精确重定向模式
+#### Test Feature Updates
+- **Updated test instructions**: Only keep precise redirection related content
+- **Removed package name mapping tests**: Removed package name mapping test cases
+- **Simplified working principle explanation**: Focus on precise redirection mode
 
-### 📋 使用方法
+### 📋 Usage
 
-#### 精确 URL 重定向（唯一模式）
+#### Precise URL Redirection (Only Mode)
 ```
-规则名称: my-redirect-rule
-旧 URL: https://esm.sh/lodash@4.17.21 （必填）
-新 URL: https://cdn.skypack.dev/lodash@4.17.21
+Rule Name: my-redirect-rule
+Old URL: https://esm.sh/lodash@4.17.21 (Required)
+New URL: https://cdn.skypack.dev/lodash@4.17.21
 ```
 
-### 🔄 迁移指南
+### 🔄 Migration Guide
 
-如果您之前使用包名映射模式，需要：
-1. 将包名转换为具体的 URL
-2. 在"旧 URL"字段填入完整的源 URL
-3. 在"新 URL"字段填入目标 URL
+If you previously used package name mapping mode, you need to:
+1. Convert package names to specific URLs
+2. Fill in the complete source URL in the "Old URL" field
+3. Fill in the target URL in the "New URL" field
 
-### 🎯 使用场景
+### 🎯 Use Cases
 
-精确重定向适用于需要将特定 URL 重定向到另一个 URL 的场景，比如：
-- 修复特定版本的 bug
-- 使用本地开发版本
-- 切换到更快的 CDN
-- 解决特定 URL 的兼容性问题
+Precise redirection is suitable for scenarios where you need to redirect specific URLs to another URL, such as:
+- Fixing bugs in specific versions
+- Using local development versions
+- Switching to faster CDNs
+- Solving compatibility issues with specific URLs
 
-### ⚠️ 重要提醒
+### ⚠️ Important Reminders
 
-- 添加或修改覆盖规则后，必须**刷新页面**才能使 Service Worker 拦截规则生效
-- 所有规则现在都是精确匹配
-- "旧 URL" 字段不能为空
+- After adding or modifying override rules, you must **refresh the page** for Service Worker interception rules to take effect
+- All rules are now exact matches
+- The "Old URL" field cannot be empty

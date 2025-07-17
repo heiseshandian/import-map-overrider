@@ -1,235 +1,268 @@
 # Import Map Overrider
 
-一个强大的 Chrome 扩展，用于显示和覆盖网页中的 ES Module Import Maps。
+A powerful Chrome extension for displaying and overriding ES Module Import Maps in web pages.
 
-## 功能特性
+## Features
 
-### 🔍 Import Map 检测与显示
-- 自动检测页面中的所有 `<script type="importmap">` 标签
-- 清晰展示每个 Import Map 的内容，包括 `imports` 和 `scopes`
-- 支持动态添加的 Import Maps 检测
-- 区分原始 Import Maps 和覆盖规则
+### 🔍 Import Map Detection and Display
 
-### ⚡ 网络拦截覆盖功能
-- 一键覆盖任何包的导入路径
-- 支持添加自定义的包覆盖规则
-- 覆盖规则持久化存储，跨页面生效
-- 使用 Service Worker 拦截网络请求实现覆盖
-- 🔗 **智能依赖处理**：自动处理相关依赖包的版本兼容性
-- 🎯 **精确 URL 重定向**：支持直接从 oldUrl 307 重定向到 newUrl
+- Automatically detect all `<script type="importmap">` tags on the page
+- Clearly display the content of each Import Map, including `imports` and `scopes`
+- Support detection of dynamically added Import Maps
+- Distinguish between original Import Maps and override rules
 
-### 🎯 开发者友好
-- 直观的用户界面，易于使用
-- 支持快速覆盖（点击包名旁的"覆盖"按钮）
-- 覆盖规则管理（添加、删除、清空）
-- 详细的错误提示和状态反馈
+### ⚡ Network Interception Override Functionality
 
-## 安装方法
+- One-click override of any package's import path
+- Support adding custom package override rules
+- Override rules are persistently stored and take effect across pages
+- Use Service Worker to intercept network requests for overrides
+- 🔗 **Smart Dependency Handling**: Automatically handle version compatibility of related dependency packages
+- 🎯 **Precise URL Redirection**: Support direct 307 redirect from oldUrl to newUrl
 
-### 开发者模式安装
-1. 打开 Chrome 浏览器
-2. 访问 `chrome://extensions/`
-3. 开启右上角的"开发者模式"
-4. 点击"加载已解压的扩展程序"
-5. 选择本项目的文件夹
-6. 扩展安装完成！
+### 🎯 Developer Friendly
 
-## 使用指南
+- Intuitive user interface, easy to use
+- Support quick override (click "Override" button next to package name)
+- Override rule management (add, delete, clear)
+- Detailed error messages and status feedback
 
-### 基本使用
-1. 访问任何使用了 Import Maps 的网页
-2. 点击浏览器工具栏中的扩展图标
-3. 查看页面中检测到的所有 Import Maps
-4. 点击任何包旁边的"覆盖"按钮来快速设置覆盖规则
+## Installation
 
-### 添加覆盖规则
+### Developer Mode Installation
 
-#### 🎯 精确 URL 重定向模式
-1. 在"添加覆盖规则"区域填写：
-   - **规则名称**：自定义规则名称（如 `my-redirect-rule`）
-   - **旧 URL**：要重定向的完整 URL（如 `https://esm.sh/lodash@4.17.21`）
-   - **新 URL**：目标 URL（如 `https://cdn.skypack.dev/lodash@4.17.21`）
-2. 点击"添加覆盖"按钮
-3. **刷新页面**使 Service Worker 拦截规则生效
+1. Open Chrome browser
+2. Visit `chrome://extensions/`
+3. Enable "Developer mode" in the top right corner
+4. Click "Load unpacked extension"
+5. Select this project's folder
+6. Extension installation complete!
 
-### 管理覆盖规则
-- **查看当前规则**：在"当前覆盖规则"区域查看所有生效的覆盖
-- **删除单个规则**：点击规则旁的"删除"按钮
-- **清空所有规则**：点击"清除所有"按钮
+## Usage Guide
 
-## 技术实现
+### Basic Usage
 
-### 架构设计
+1. Visit any webpage that uses Import Maps
+2. Click the extension icon in the browser toolbar
+3. View all Import Maps detected on the page
+4. Click the "Override" button next to any package to quickly set override rules
+
+### Adding Override Rules
+
+#### 🎯 Precise URL Redirection Mode
+
+1. Fill in the "Add Override Rules" section:
+
+- **Rule Name**: Custom rule name (e.g., `my-redirect-rule`)
+- **Old URL**: Complete URL to redirect (e.g., `https://esm.sh/lodash@4.17.21`)
+- **New URL**: Target URL (e.g., `https://cdn.skypack.dev/lodash@4.17.21`)
+
+2. Click "Add Override" button
+3. **Refresh the page** for Service Worker interception rules to take effect
+
+### Managing Override Rules
+
+- **View Current Rules**: View all active overrides in the "Current Override Rules" section
+- **Delete Single Rule**: Click the "Delete" button next to a rule
+- **Clear All Rules**: Click the "Clear All" button
+
+## Technical Implementation
+
+### Architecture Design
+
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Popup UI      │    │  Content Script  │    │ Service Worker  │
-│   (popup.js)    │◄──►│   (content.js)   │◄──►│ (background.js) │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Popup.js      │    │  Content.js     │    │ Background.js   │
+│   (UI Logic)    │    │ (Page Detection)│    │(Service Worker) │
+│                 │    │                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │Override Mgmt│ │    │ │Import Map   │ │    │ │Network      │ │
+│ │             │ │    │ │Detection    │ │    │ │Interception │ │
+│ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
         │                       │                       │
-        ▼                       ▼                       ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ Chrome Storage  │    │   DOM Observer   │    │ Network Intercept│
-│   (持久化)       │    │   (监听变化)     │    │   (请求拦截)     │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+        │   (Persistent)        │    (Listen Changes)   │    (Request Interception)
+        └───────────────────────┼───────────────────────┼─────────────────────────
+                               │                       │
+                    ┌─────────────────┐    ┌─────────────────┐
+                    │ Chrome Storage  │    │ Network Requests│
+                    │                 │    │                 │
+                    └─────────────────┘    └─────────────────┘
 ```
 
-### 核心组件
+### Core Components
 
-#### 1. Popup Interface (`popup.js`)
-- 用户交互界面
-- Import Maps 展示
-- 覆盖规则管理
-- 与 Content Script 通信
+**Popup.js**:
 
-#### 2. Content Script (`content.js`)
-- 页面级别的 Import Map 检测
-- DOM 变化监听
-- 覆盖规则应用
-- 消息传递桥梁
+- User interaction interface
+- Import Maps display
+- Override rule management
+- Communication with Content Script
 
-#### 3. Service Worker (`background.js`)
-- 网络请求拦截和重定向
-- 动态规则管理
-- 跨页面覆盖规则应用
-- 后台持续运行
+**Content.js**:
 
-### 覆盖机制
+- Page-level Import Map detection
+- DOM change monitoring
+- Override rule application
+- Message passing bridge
 
-扩展通过以下方式实现 Import Map 覆盖：
+**Background.js**:
 
-1. **网络拦截**：使用 Service Worker 的 declarativeNetRequest API 拦截网络请求
-2. **URL 重定向**：将匹配的模块请求重定向到指定的新 URL
-3. **动态规则**：根据用户配置动态创建和更新拦截规则
-4. **持久化存储**：使用 Chrome Storage API 保存覆盖规则
-5. **精确匹配**：直接匹配完整 URL，确保精确控制
+- Network request interception and redirection
+- Dynamic rule management
+- Cross-page override rule application
+- Background continuous operation
 
-## 常见用例
+### Override Mechanism
 
-### 1. 开发环境调试
+The extension implements Import Map override through the following methods:
+
+1. **Network Interception**: Use Service Worker's declarativeNetRequest API to intercept network requests
+2. **URL Redirection**: Redirect matching module requests to specified new URLs
+3. **Dynamic Rules**: Dynamically create and update interception rules based on user configuration
+4. **Persistent Storage**: Use Chrome Storage API to save override rules
+5. **Precise Matching**: Direct matching of complete URLs for precise control
+
+## Common Use Cases
+
+### 1. Development Environment Debugging
+
 ```javascript
-// 原始 Import Map
+// Original Import Map
 {
   "imports": {
-    "react": "https://cdn.skypack.dev/react@17.0.2"
+    "react": "https://esm.sh/react@18.2.0"
   }
 }
 
-// 覆盖为本地开发版本
+// Override to local development version
 {
   "imports": {
-    "react": "http://localhost:3000/react.development.js"
+    "react": "http://localhost:3000/react.js"
   }
 }
 ```
 
-### 2. 版本切换测试
+### 2. Version Switching Testing
+
 ```javascript
-// 快速切换不同版本进行兼容性测试
-"react": "https://esm.sh/react@18.2.0"  // 测试新版本
-"react": "https://esm.sh/react@17.0.2"  // 回退到稳定版本
+// Quickly switch between different versions for compatibility testing
+"react": "https://esm.sh/react@18.2.0"  // Test new version
+"react": "https://esm.sh/react@17.0.2"  // Rollback to stable version
 ```
 
-### 3. CDN 切换
+### 3. CDN Switching
+
 ```javascript
-// 从一个 CDN 切换到另一个
-// 旧 URL: "https://cdn.skypack.dev/lodash@4.17.21"
-// 新 URL: "https://esm.sh/lodash@4.17.21"
+// Switch from one CDN to another
+// Old URL: "https://cdn.skypack.dev/lodash@4.17.21"
+// New URL: "https://esm.sh/lodash@4.17.21"
 ```
 
-## 兼容性
+## Compatibility
 
-- **浏览器**：Chrome 88+ (Manifest V3)
-- **网页**：支持 ES Modules 和 Import Maps 的现代浏览器
-- **框架**：与所有使用 Import Maps 的框架兼容
+- **Browser**: Chrome 88+ (Manifest V3)
+- **Web Pages**: Modern browsers that support ES Modules and Import Maps
+- **Frameworks**: Compatible with all frameworks that use Import Maps
 
-## 开发说明
+## Development Notes
 
-### 项目结构
+### Project Structure
+
 ```
 import-map-overrider/
-├── manifest.json          # 扩展配置文件
-├── popup.html            # 弹窗界面
-├── popup.js              # 弹窗逻辑
-├── content.js            # 内容脚本
-├── background.js         # Service Worker
-├── test.html             # 测试页面
-└── README.md             # 说明文档
+├── manifest.json          # Extension configuration file
+├── popup.html            # Popup interface
+├── popup.js              # Popup logic
+├── content.js            # Content script
+├── background.js         # Background script
+├── test.html             # Test page
+└── README.md             # Documentation
 ```
 
-### 权限说明
-- `activeTab`：访问当前活动标签页
-- `storage`：存储覆盖规则
-- `scripting`：注入脚本到页面
-- `declarativeNetRequest`：拦截和重定向网络请求
-- `declarativeNetRequestWithHostAccess`：访问主机权限
-- `<all_urls>`：在所有网站上工作
+### Permission Explanation
 
-## 故障排除
+- `activeTab`: Access current active tab
+- `storage`: Store override rules
+- `scripting`: Inject scripts into pages
+- `declarativeNetRequest`: Intercept and redirect network requests
+- `declarativeNetRequestWithHostAccess`: Host access permissions
+- `<all_urls>`: Work on all websites
 
-### 常见问题
+## Troubleshooting
 
-**Q: 覆盖规则不生效？**
-A: 确保：
-- 包名拼写正确
-- URL 格式正确且可访问
-- 页面确实使用了 Import Maps
-- **已刷新页面**（Service Worker 拦截需要页面重新加载）
-- 检查开发者工具的 Network 标签页，确认请求被重定向
+### Common Issues
 
-**Q: 更新包版本后出现依赖错误？**
-A: 这通常是依赖包版本不兼容导致的：
-- 需要手动添加依赖包的覆盖规则
-- 例如：将 `vue-demi` 的完整 URL 重定向为兼容的版本
+**Q: Override rules not taking effect?**
+A: Make sure:
 
-**Q: Vue Router 导出错误（useRouter 等）？**
-A: 这通常是构建版本不匹配导致的：
-- 需要手动添加 vue-router 的重定向规则
-- Vue 3.x 需要使用 vue-router 4.x 的 ESM 浏览器构建版本
-- 确保新 URL 包含 `esm-browser.js` 后缀
+- Package name is spelled correctly
+- URL format is correct and accessible
+- Page actually uses Import Maps
+- **Page has been refreshed** (Service Worker interception requires page reload)
+- Check Network tab in developer tools to confirm requests are being redirected
 
-**Q: 检测不到 Import Maps？**
-A: 可能原因：
-- 页面没有使用 Import Maps
-- Import Maps 是动态加载的（稍等片刻后点击刷新）
-- 页面使用了非标准的模块加载方式
+**Q: Dependency errors after updating package version?**
+A: This is usually caused by incompatible dependency package versions:
 
-**Q: 扩展图标是灰色的？**
-A: 检查：
-- 扩展是否正确安装
-- 是否在支持的网站上
-- 浏览器是否支持 Manifest V3
+- Need to manually add override rules for dependency packages
+- For example: Redirect the complete URL of `vue-demi` to a compatible version
 
-## 贡献指南
+**Q: Vue Router export errors (useRouter etc.)?**
+A: This is usually caused by mismatched build versions:
 
-欢迎提交 Issue 和 Pull Request！
+- Need to manually add vue-router redirect rules
+- Vue 3.x requires vue-router 4.x ESM browser build version
+- Ensure new URL includes `esm-browser.js` suffix
 
-### 开发环境设置
-1. Clone 项目
-2. 在 Chrome 中加载扩展
-3. 修改代码后重新加载扩展
-4. 测试功能
+**Q: Import Maps not detected?**
+A: Possible reasons:
 
-## 许可证
+- Page doesn't use Import Maps
+- Import Maps are dynamically loaded (wait a moment then click refresh)
+- Page uses non-standard module loading methods
 
-MIT License - 详见 LICENSE 文件
+**Q: Extension icon is grayed out?**
+A: Check:
 
-## 更新日志
+- Extension is properly installed
+- On a supported website
+- Browser supports Manifest V3
 
-### v3.0.0
-- **重大更新**：简化为精确 URL 重定向模式
-- 移除包名映射功能，专注于精确 URL 控制
-- 更直观的用户界面和使用方式
-- 提高重定向的可预测性和准确性
+## Contributing
 
-### v2.0.0
-- **重大更新**：改用 Service Worker 网络拦截方式实现覆盖
-- 更稳定的覆盖机制，不受浏览器 Import Map 解析限制
-- 优化用户界面，添加工作原理说明
+Welcome to submit Issues and Pull Requests!
+
+### Development Environment Setup
+
+1. Clone the project
+2. Load extension in Chrome
+3. Reload extension after modifying code
+4. Test functionality
+
+## License
+
+MIT License - See LICENSE file for details
+
+## Changelog
+
+### v2.0.0 (Current)
+
+- **Major Update**: Simplified to precise URL redirection mode
+- Removed package name mapping functionality, focused on precise URL control
+- More intuitive user interface and usage
+- Improved redirection predictability and accuracy
+
+### v1.1.0
+
+- **Major Update**: Changed to Service Worker network interception for overrides
+- More stable override mechanism, not limited by browser Import Map parsing
+- Optimized user interface, added working principle explanation
 
 ### v1.0.0
-- 初始版本发布
-- 基本的 Import Map 检测和显示
-- 覆盖规则添加和管理（基于 Import Map 注入）
-- 持久化存储支持
-- 动态 Import Map 监听
 
+- Initial version release
+- Basic Import Map detection and display
+- Override rule addition and management (based on Import Map injection)
+- Persistent storage support
+- Dynamic Import Map monitoring
